@@ -8,3 +8,7 @@ assert.throws(()=>validateProject({...original,measurements:{...original.measure
 const clean=parseProject(JSON.stringify({...original,unknown:'ignored',measurements:{...original.measurements,unknown:123}}));
 assert.equal(clean.unknown,undefined);assert.equal(clean.measurements.unknown,undefined);
 console.log('Project file: lossless round trip and incompatible/corrupted input checks OK');
+const modeled={...original,modeling:{kind:'taper-study',startBelowHip:10,hemReduction:1.5}};
+assert.deepEqual(parseProject(JSON.stringify(modeled)),modeled);
+for(const modeling of [null,{kind:'unknown',startBelowHip:9,hemReduction:1},{kind:'taper-study',startBelowHip:7,hemReduction:1},{kind:'taper-study',startBelowHip:9,hemReduction:3},{kind:'taper-study',startBelowHip:'9',hemReduction:1}])assert.throws(()=>validateProject({...original,modeling}));
+console.log('Optional modeling: backward compatibility, lossless round trip and invalid settings OK');

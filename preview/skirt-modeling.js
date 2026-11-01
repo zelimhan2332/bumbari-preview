@@ -22,13 +22,19 @@
  const host=document.createElement('section');host.className='note';
  host.innerHTML='<h3>Заужение юбки · построение по книге</h3><p>Учебные линии моделирования, не отдельное готовое лекало. Основа и талия не изменяются. Для свободы движения книге нужны шлица или складка; их построение пока не добавлено.</p><label>Начало ниже бёдер, см <input id="taper-start" type="number" min="8" max="10" step="0.5" value="9"></label> <label>Заужение каждого бокового среза у низа, см <input id="taper-reduction" type="number" min="0" max="2" step="0.5" value="1"></label><p>Диапазон заужения 0–2 см ограничен прототипом. В книге величина связана с длиной и моделью, а не вычисляется одной универсальной формулой.</p><p id="taper-result" aria-live="polite"></p><div id="taper-preview"></div>';
  document.getElementById('s3').append(host);
+ root.getSkirtModeling=()=>({kind:'taper-study',startBelowHip:Number(document.getElementById('taper-start').value),hemReduction:Number(document.getElementById('taper-reduction').value)});
+ root.setSkirtModeling=m=>{
+  document.getElementById('taper-start').value=m?.startBelowHip??9;
+  document.getElementById('taper-reduction').value=m?.hemReduction??1;
+  refresh();
+ };
  function refresh(){
   const output=document.getElementById('taper-result'),preview=document.getElementById('taper-preview');
   try{
    const c=root.calculateSkirtReference({waist:number('waist'),hip:number('hip'),hipHeight:number('hipheight'),length:number('length'),hipEaseHalf:Number(document.getElementById('hip-ease').value),material:document.getElementById('material').value});
    const t=taperSkirt({halfWidth:c.hipHalfWithEase/2,hipHeight:number('hipheight'),length:number('length'),startBelowHip:Number(document.getElementById('taper-start').value),hemReduction:Number(document.getElementById('taper-reduction').value)});
    const f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
-   output.textContent=`От талии до начала заужения: ${f(t.startY)} см. Ширина полотнища у низа: ${f(t.hemWidth)} см. Уменьшение полного обхвата низа: ${f(t.fullHemReduction)} см. Длина каждого бокового участка ниже бёдер: ${f(t.sideBelowHip)} см. ${t.source}. Эта настройка пока НЕ входит в PDF основы и файл проекта.`;
+   output.textContent=`От талии до начала заужения: ${f(t.startY)} см. Ширина полотнища у низа: ${f(t.hemWidth)} см. Уменьшение полного обхвата низа: ${f(t.fullHemReduction)} см. Длина каждого бокового участка ниже бёдер: ${f(t.sideBelowHip)} см. ${t.source}. Настройки сохраняются в файл проекта. В PDF печатается только прямая основа, БЕЗ заужения.`;
    const scale=260/t.length,x=v=>20+v*scale,y=v=>15+v*scale;
    preview.innerHTML=`<svg viewBox="0 0 ${40+t.halfWidth*scale} 295" style="max-height:300px" role="img" aria-label="Линии заужения одного полотнища"><path d="M${x(0)} ${y(t.hipHeight)}H${x(t.halfWidth)}V${y(t.length)}H${x(0)}Z" fill="none" stroke="#9cabbc" stroke-dasharray="4 3"/><path d="M${x(t.halfWidth)} ${y(t.hipHeight)}V${y(t.startY)}L${x(t.hemWidth)} ${y(t.length)}H${x(0)}" fill="none" stroke="#244d80" stroke-width="2"/></svg>`;
   }catch(e){output.textContent=e.message;preview.replaceChildren();}

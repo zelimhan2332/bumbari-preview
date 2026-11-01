@@ -12,7 +12,13 @@
     if(measurements.hip<=measurements.waist||measurements.hipheight>=measurements.length)throw Error('Проверьте соотношение талии, бёдер, высоты бёдер и длины.');
     if(!['woven','stretch','leather'].includes(input.material)||![1,2].includes(input.hipEaseHalf))throw Error('Неизвестный материал или прибавка.');
     if(typeof input.name!=='string'||input.name.length>100||typeof input.notes!=='string'||input.notes.length>20000)throw Error('Название или заметки слишком длинные либо повреждены.');
-    return {format:'mueller-project',version:1,units:'cm',name:input.name.trim(),item:'skirt',measurements,material:input.material,hipEaseHalf:input.hipEaseHalf,notes:input.notes};
+    const result={format:'mueller-project',version:1,units:'cm',name:input.name.trim(),item:'skirt',measurements,material:input.material,hipEaseHalf:input.hipEaseHalf,notes:input.notes};
+    if(input.modeling!==undefined){
+      const m=input.modeling;
+      if(!m||m.kind!=='taper-study'||!Number.isFinite(m.startBelowHip)||m.startBelowHip<8||m.startBelowHip>10||!Number.isFinite(m.hemReduction)||m.hemReduction<0||m.hemReduction>2)throw Error('Некорректные настройки учебного заужения.');
+      result.modeling={kind:'taper-study',startBelowHip:m.startBelowHip,hemReduction:m.hemReduction};
+    }
+    return result;
   }
   function parseProject(text){
     if(typeof text!=='string'||text.length>100000)throw Error('Файл слишком большой. Выберите файл проекта до 100 КБ.');
