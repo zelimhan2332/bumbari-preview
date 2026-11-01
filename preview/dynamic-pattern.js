@@ -11,6 +11,8 @@ function build(v){
  function candidate(take,rise){
   const g=JSON.parse(JSON.stringify(base)),h=g.half,H=v.hipHeight;
   g.front.end.x-=take/2;g.back.start.x+=take/2;g.back.start.y=-rise;
+   // Preserve the selected source offset as numerical truing moves the side endpoint.
+   for(const d of g.front.darts)for(const point of [d.left,d.right,d.tip])point.x-=take/2;
   for(const p of [g.front,g.back]){if(!reference)for(const d of p.darts){d.tip.y*=H/20.8;d.closeAngle=Math.atan2(d.left.y-d.tip.y,d.left.x-d.tip.x)-Math.atan2(d.right.y-d.tip.y,d.right.x-d.tip.x);}p.waist=E.waistSegments(p.start,p.end,p.darts);}
   const f=g.front.end,b=g.back.start;
   g.front.side={a:f,c1:{x:f.x+(h-f.x)/2,y:f.y+(H-f.y)/3},c2:{x:h,y:H*.7},b:{x:h,y:H}};

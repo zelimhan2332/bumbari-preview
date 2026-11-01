@@ -48,7 +48,9 @@
     const two=c.darts.back.length===2,shift=two?.5:0;
     const frontSide=half-c.darts.side/2-shift;
     const backSide=c.darts.side/2-shift;
-    const frontDarts=[dart(half-p.frontOffset,c.darts.front,p.frontLength,p.frontRise)];
+    // PDF 6 / printed 7: measure 6–8 cm from the shaped side seam along the waist,
+    // not from the original vertical side line of the rectangular grid.
+    const frontDarts=[dart(frontSide-p.frontOffset,c.darts.front,p.frontLength,p.frontRise)];
     const mainCenter=two?half-p.mainBackOffset:(backSide+half)/2;
     const backDarts=two?[dart((backSide+mainCenter)/2,c.darts.back[1],p.extraBackLength,p.extraBackRise),dart(mainCenter,c.darts.back[0],p.backLength,p.mainBackRise)]:[dart(mainCenter,c.darts.back[0],p.backLength,p.backRise)];
     const front={start:{x:0,y:0},end:{x:frontSide,y:-p.sideRise},darts:frontDarts};

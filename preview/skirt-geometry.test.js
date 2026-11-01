@@ -11,7 +11,8 @@ for(const waist of [76,72]){
   assert.equal(g.audit.cutReady,false);
   assert.equal(g.audit.sidePass,waist===76);
   assert.equal(g.front.darts[0].left.y,-.6);
-  assert.equal(g.front.darts[0].tip.x,18.5);
+  assert.equal(g.front.end.x-g.front.darts[0].tip.x,7,'front dart offset measured from shaped waist side seam');
+  assert.equal(g.front.darts[0].tip.x,waist===76?15:14.5);
   assert.equal(g.front.darts[0].tip.y,9.5);
   assert.equal(g.back.darts.length,waist===72?2:1);
   if(waist===72){assert.equal(g.sideShift,.5);assert.equal(g.back.darts[1].tip.x,19.5);assert.equal(g.back.darts[0].tip.x,11.25);assert.equal(g.back.darts[1].rise,.35);}
