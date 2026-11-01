@@ -6,6 +6,7 @@ const html=read('index.html');
 assert(html.includes('<title>Bumbari · Лекала по вашим меркам</title>'));
 assert(html.includes('class="mark">B<'));
 assert(html.includes('#142d50'));
+assert(/:root\{[^}]*background:#e3f0ff/.test(html));
 assert(!html.includes('Мюллер'));
 // Existing storage and project formats remain compatible after rebranding.
 assert(html.includes('mueller-preview-v1'));
