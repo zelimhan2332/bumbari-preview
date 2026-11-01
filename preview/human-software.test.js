@@ -9,10 +9,21 @@ for(const key of ['height','bust','waist','hip','hipheight'])assert.notEqual(fro
 assert.notEqual(front,r(v,'waist',{},'side'));
 assert.notEqual(front,r(v,'waist',{},'back'));
 // No WebGL library: mounting must still show the SAME human mesh, not a cartoon.
-const container={dataset:{},innerHTML:''};
+const container={dataset:{},style:{},innerHTML:''};
 assert(ctx.window.mountHumanMannequin(container,v,'waist',{}));
 assert(container.innerHTML.includes('человеческая модель'));
 const previous=container.innerHTML;
 ctx.window.setMannequinView('side');
 assert.notEqual(container.innerHTML,previous);
+const side=container.innerHTML;
+const event={pointerId:1,button:0,clientX:10,clientY:10,preventDefault(){}};
+container.onpointerdown(event);
+container.onpointermove({...event,clientX:45,clientY:30});
+assert.notEqual(container.innerHTML,side,'drag rotates in two axes');
+container.onpointerup();
+const rotated=container.innerHTML;
+container.onwheel({deltaY:-200,preventDefault(){}});
+assert.notEqual(container.innerHTML,rotated,'wheel zooms');
+container.ondblclick();
+assert.equal(container.innerHTML,front,'double click resets camera');
 console.log('CPU human mesh: all measurements, three views and WebGL-free mounting OK');

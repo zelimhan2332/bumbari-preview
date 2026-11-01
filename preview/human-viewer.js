@@ -1,6 +1,6 @@
 /* Offline anatomical preview. Measurements control a regional deformation, not cloth fit. */
 (function(){
-  let state,softwareOnly=false,softwareView='front',softwareLast;
+  let state,softwareOnly=false,softwareView={yaw:0,pitch:0,zoom:1},softwareLast;
   const defaults={height:170,bust:92,waist:72,hip:100,hipheight:20.8,length:61.5};
   const sane=(v,d)=>Number.isFinite(v)&&v>0?v:d;
   let chestSurface;
@@ -89,7 +89,7 @@
   }
   window.mountHumanMannequin=function(container,values,active,options={}){
     softwareLast={container,values,active,options};
-    const software=()=>{const signature=JSON.stringify([values,options,softwareView]);if(container.dataset.humanSignature!==signature){container.innerHTML=window.renderHumanSoftware(values,active,options,softwareView);container.dataset.humanSignature=signature;}return true;};
+    const software=()=>{const draw=()=>{container.innerHTML=window.renderHumanSoftware(values,active,options,softwareView);container.dataset.humanSignature=JSON.stringify([values,options,softwareView]);};const signature=JSON.stringify([values,options,softwareView]);if(container.dataset.humanSignature!==signature)draw();window.bindHumanOrbit(container,softwareView,draw);return true;};
     if(softwareOnly&&window.renderHumanSoftware)return software();
     try{
       const s=state||init();const v=Object.fromEntries(Object.entries(defaults).map(([k,d])=>[k,sane(values[k],d)]));
@@ -134,6 +134,6 @@
       s.active=active;s.draw();return true;
     }catch(error){softwareOnly=true;if(window.renderHumanSoftware)return software();container.innerHTML='Не удалось загрузить человеческую модель. Обновите страницу.';console.warn('Mannequin preview',error);return false;}
   };
-  window.setMannequinView=function(view){if(softwareOnly&&softwareLast){softwareView=view;const s=softwareLast;window.mountHumanMannequin(s.container,s.values,s.active,s.options);return;}if(!state)return;const p=view==='side'?[350,94,0]:view==='back'?[0,94,-350]:[0,94,350];state.camera.position.set(...p);state.controls.target.set(0,88,0);state.controls.update();state.draw();};
+  window.setMannequinView=function(view){if(softwareOnly&&softwareLast){softwareView.yaw=view==='side'?Math.PI/2:view==='back'?Math.PI:0;softwareView.pitch=0;const s=softwareLast;window.mountHumanMannequin(s.container,s.values,s.active,s.options);return;}if(!state)return;const p=view==='side'?[350,94,0]:view==='back'?[0,94,-350]:[0,94,350];state.camera.position.set(...p);state.controls.target.set(0,88,0);state.controls.update();state.draw();};
   window.humanPreviewModel={deform,heightAt,defaults};
 })();
