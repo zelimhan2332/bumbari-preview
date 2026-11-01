@@ -1,5 +1,5 @@
 (function(root){
-const node=typeof module!=='undefined',E=node?require('./skirt-geometry'):root.MuellerSkirtGeometry,calc=node?require('./skirt-calculation').calculateSkirtReference:calculateSkirtReference;
+const node=typeof module!=='undefined',E=node?require('./skirt-geometry'):root.MuellerSkirtGeometry,calc=node?require('./skirt-calculation').calculateSkirtReference:calculateSkirtReference,waistband=node?require('./waistband').buildWaistband:root.buildWaistband;
 function build(v){
  const c=calc(v),reference=c.exactBookCase;
  if(!c.darts){
@@ -43,8 +43,10 @@ function artwork(data){
   text(x+20,y+L*.55,front?'FRONT: 1 ON FOLD':'BACK: 2 MIRRORED');text(x+20,y+L*.55+8,'SEAM LINE - ADD ALLOWANCES');
   line(x+h*.6,y+L*.65,x+h*.6,y+L*.9);line(x+h*.6,y+L*.65,x+h*.6-3,y+L*.65+7);line(x+h*.6,y+L*.65,x+h*.6+3,y+L*.65+7);text(x+h*.6+4,y+L*.77,'GRAIN');
  }
- const band=(v.waist+5)*10,by=L+65;line(15,by,15+band,by);line(15,by+60,15+band,by+60);line(15,by,15,by+60);line(15+band,by,15+band,by+60);line(15,by+30,15+band,by+30);line(15+band-30,by,15+band-30,by+60);
- text(20,by+13,`WAISTBAND ${v.waist+5} x 6 cm / overlap 3 cm / ADD ALLOWANCES`);
+  const belt=waistband({waistSeam:g.audit.waist*2}),band=belt.length*10,by=L+65;
+  line(15,by,15+band,by);line(15,by+belt.cutWidth*10,15+band,by+belt.cutWidth*10);line(15,by,15,by+belt.cutWidth*10);line(15+band,by,15+band,by+belt.cutWidth*10);line(15,by+belt.finishedWidth*10,15+band,by+belt.finishedWidth*10);line(15+band-belt.overlap*10,by,15+band-belt.overlap*10,by+belt.cutWidth*10);
+  text(20,by+13,`WAISTBAND ${belt.length.toFixed(2)} x ${belt.cutWidth} cm / overlap ${belt.overlap} cm / ADD ALLOWANCES`);
+  text(20,by+23,'ATELIER 2001 PDF 9 FIG 9 / LENGTH MATCHED TO GENERATED WAIST SEAM');
  const sx=bx+h+20;line(sx,40,sx+100,40);line(sx,140,sx+100,140);line(sx,40,sx,140);line(sx+100,40,sx+100,140);text(sx,32,'CONTROL 100 x 100 mm');
  return {cmd,width:Math.max(sx+110,band+30),height:by+75};
 }
