@@ -88,6 +88,7 @@
     return state;
   }
   window.mountHumanMannequin=function(container,values,active,options={}){
+    if(container.closest?.('[data-mannequin-hidden]'))return false;
     softwareLast={container,values,active,options};
     const software=()=>{const draw=()=>{if(typeof document!=='undefined'){let canvas=container.querySelector('canvas');if(!canvas){canvas=document.createElement('canvas');canvas.width=540;canvas.height=548;canvas.style.cssText='width:100%;height:100%;object-fit:contain;display:block';canvas.setAttribute('aria-label','Объёмный манекен: вращайте мышью или пальцем');container.replaceChildren(canvas);}window.renderHumanSoftware(values,active,options,softwareView,canvas);}else container.innerHTML=window.renderHumanSoftware(values,active,options,softwareView);container.dataset.humanSignature=JSON.stringify([values,options,softwareView]);};const signature=JSON.stringify([values,options,softwareView]);if(container.dataset.humanSignature!==signature)draw();window.bindHumanOrbit(container,softwareView,draw);return true;};
     if(softwareOnly&&window.renderHumanSoftware)return software();
