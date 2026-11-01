@@ -129,7 +129,7 @@
       const linePoints=active==='height'?[new T.Vector3(-56,0,0),new T.Vector3(-56,v.height,0)]:active==='hipheight'?[new T.Vector3(47,hy,0),new T.Vector3(47,wy,0)]:active==='length'?[new T.Vector3(-49,Math.max(0,hem),0),new T.Vector3(-49,wy,0)]:[];
       if(linePoints.length)s.marks.add(new T.Mesh(new T.TubeGeometry(new T.LineCurve3(...linePoints),1,.35,8,false),new T.MeshBasicMaterial({color:0xffb000})));
       s.active=active;s.draw();return true;
-    }catch(error){container.innerHTML=window.bodyGuide?bodyGuide(active,values):'3D-просмотр недоступен';console.warn('Mannequin preview',error);return false;}
+    }catch(error){container.innerHTML=window.bodyGuide?window.bodyGuide(active,values,options):'3D-просмотр недоступен';console.warn('Mannequin preview',error);return false;}
   };
   window.setMannequinView=function(view){if(!state)return;const p=view==='side'?[350,94,0]:view==='back'?[0,94,-350]:[0,94,350];state.camera.position.set(...p);state.controls.target.set(0,88,0);state.controls.update();state.draw();};
   window.humanPreviewModel={deform,heightAt,defaults};
