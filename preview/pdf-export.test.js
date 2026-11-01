@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const {imagePdf}=require('./pdf-export');
+const jpeg=Uint8Array.from([255,216,1,0,255,217]);
+const data=imagePdf(jpeg,1200,1733),text=Buffer.from(data).toString('latin1');
+assert.ok(text.startsWith('%PDF-1.4'));
+const xref=Number(text.match(/startxref\n(\d+)/)[1]);assert.equal(text.slice(xref,xref+4),'xref');
+const entries=text.slice(xref).split('\n').slice(3,8);
+entries.forEach((entry,i)=>{const at=Number(entry.slice(0,10));assert.ok(text.slice(at).startsWith(`${i+1} 0 obj`));});
+assert.match(text,/\/MediaBox \[0 0 595.276 841.89\]/);
+assert.match(text,/\/Width 1200 \/Height 1733/);
+const start=text.indexOf('stream\n')+7;assert.deepEqual(data.slice(start,start+jpeg.length),jpeg);
+console.log('PDF container: A4, binary image stream and all cross-reference offsets OK');

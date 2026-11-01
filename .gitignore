@@ -1,0 +1,9 @@
+.env
+.env.*
+*.pdf
+*.jks
+*.keystore
+node_modules/
+site/
+private/
+client-data/

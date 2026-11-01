@@ -1,0 +1,18 @@
+const assert = require('node:assert/strict');
+const { calculateSkirtReference } = require('./skirt-calculation');
+const a = calculateSkirtReference({ waist: 76, hip: 100, hipHeight: 20.8, length: 61.5 });
+assert.equal(a.intake, 12);
+assert.deepEqual(a.darts, { side: 7, front: 2, back: [3] });
+const b = calculateSkirtReference({ waist: 72, hip: 100, hipHeight: 20.8, length: 61.5 });
+assert.equal(b.intake, 14);
+assert.deepEqual(b.darts, { side: 7, front: 2, back: [3, 2] });
+const custom = calculateSkirtReference({ waist: 74, hip: 104, hipHeight: 21, length: 62 });
+assert.equal(custom.intake, 15);
+assert.equal(custom.darts, null);
+const secondEase = calculateSkirtReference({ waist: 72, hip: 100, hipHeight: 20.8, length: 61.5, hipEaseHalf: 2 });
+assert.equal(secondEase.hipHalfWithEase, 52);
+assert.equal(secondEase.intake, 15);
+assert.equal(secondEase.darts, null);
+assert.throws(() => calculateSkirtReference({ waist: 72, hip: 100, hipHeight: 20.8, length: 61.5, material: 'stretch' }));
+assert.throws(() => calculateSkirtReference({ waist: 100, hip: 90, hipHeight: 20, length: 60 }));
+console.log('Skirt reference calculations: OK');

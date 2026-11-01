@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');
+const {parseProject,validateProject}=require('./project-file');
+const original={format:'mueller-project',version:1,units:'cm',name:'Юбка №1',item:'skirt',measurements:{height:170,bust:92,waist:72,hip:100,hipheight:20.8,length:61.5},material:'woven',hipEaseHalf:1,notes:'Уточнить баланс переда\nПроверить боковой шов'};
+assert.deepEqual(parseProject(JSON.stringify(original)),original,'file round trip preserves measurements, Unicode and notes');
+assert.equal(parseProject(JSON.stringify({...original,name:'<img src=x onerror=alert(1)>'})).name,'<img src=x onerror=alert(1)>','names stay data, not executable markup');
+for(const input of ['{',JSON.stringify({...original,version:2}),JSON.stringify({...original,units:'in'}),JSON.stringify({...original,measurements:{...original.measurements,waist:'72'}}),JSON.stringify({...original,measurements:{...original.measurements,hip:60}}),JSON.stringify({...original,notes:'x'.repeat(20001)}),'x'.repeat(100001)])assert.throws(()=>parseProject(input));
+assert.throws(()=>validateProject({...original,measurements:{...original.measurements,height:Infinity}}));
+const clean=parseProject(JSON.stringify({...original,unknown:'ignored',measurements:{...original.measurements,unknown:123}}));
+assert.equal(clean.unknown,undefined);assert.equal(clean.measurements.unknown,undefined);
+console.log('Project file: lossless round trip and incompatible/corrupted input checks OK');
