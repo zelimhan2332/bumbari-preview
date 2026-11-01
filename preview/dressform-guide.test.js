@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const {dressformGuide}=require('./dressform-guide');
+const base={bust:92,waist:72,hip:100,hipheight:20.8,length:61.5};
+const a=dressformGuide('waist',base);
+assert(a.includes('Портновский манекен'));
+assert(!a.includes('NaN'));
+for(const key of ['bust','waist','hip','hipheight'])assert.notEqual(a,dressformGuide('waist',{...base,[key]:base[key]+10}));
+const garment={mode:'garment',item:'skirt'};
+assert.notEqual(dressformGuide('waist',base,garment),dressformGuide('waist',{...base,length:80},garment));
+assert(dressformGuide('waist',{},garment).includes('не проверка посадки'));
+console.log('Dress form fallback: proportions, garment length and safe defaults OK');
