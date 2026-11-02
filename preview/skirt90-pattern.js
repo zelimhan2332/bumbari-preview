@@ -8,12 +8,15 @@
     const waistRadius=waist/(Math.PI/2), hemRadius=waistRadius+length;
     return {waist,length,angle:90,waistRadius,hemRadius,arcAtWaist:waist,cutReady:false};
   }
-  function panel(values){
+  function output(values){
     try{
       const d=build(values),scale=210/d.hemRadius,cx=26,cy=242,ri=d.waistRadius*scale,ro=d.hemRadius*scale;
       const svg='<svg viewBox="0 0 270 270" role="img" aria-label="Черновой сектор юбки 90 градусов" style="display:block;width:min(100%,360px);height:auto;margin:10px auto"><path d="M '+cx+' '+(cy-ri)+' A '+ri+' '+ri+' 0 0 1 '+(cx+ri)+' '+cy+' L '+(cx+ro)+' '+cy+' A '+ro+' '+ro+' 0 0 0 '+cx+' '+(cy-ro)+' Z" fill="#dbe5f2" stroke="#142d50" stroke-width="2"/><path d="M '+cx+' '+(cy-ri)+' L '+cx+' '+(cy-ro)+' M '+(cx+ri)+' '+cy+' L '+(cx+ro)+' '+cy+'" stroke="#627a9a" stroke-dasharray="4 3"/><text x="48" y="28" fill="#142d50" font-size="12">90°</text></svg>';
-      return '<section class="note" style="background:#e4ebf4;color:#142d50"><h3 style="margin:0 0 8px">Первый чертёж · сектор 90°</h3><p>Сейчас используются мерки талии и длины из шага «Мерки».</p>'+svg+'<p><b>Радиус талии:</b> '+d.waistRadius.toLocaleString('ru-RU',{maximumFractionDigits:1})+' см<br><b>Радиус низа:</b> '+d.hemRadius.toLocaleString('ru-RU',{maximumFractionDigits:1})+' см<br><b>Длина дуги талии:</b> '+d.arcAtWaist+' см</p><p><b>Пока черновик:</b> это сектор с углом 90° по формуле длины дуги. Не учитывает швы, припуски, долевую, застёжку и проверку посадки. Печать и раскрой не готовы. Для превращения в рабочее лекало нужно сшить пробник и сверить методику.</p></section>';
-    }catch(error){return '<section class="note" style="background:#e4ebf4;color:#142d50"><h3>Первый чертёж · сектор 90°</h3><p>'+error.message+'</p></section>';}
+      return '<div>'+svg+'<p><b>Радиус талии:</b> '+d.waistRadius.toLocaleString('ru-RU',{maximumFractionDigits:1})+' см<br><b>Радиус низа:</b> '+d.hemRadius.toLocaleString('ru-RU',{maximumFractionDigits:1})+' см<br><b>Длина дуги талии:</b> '+d.arcAtWaist.toLocaleString('ru-RU',{maximumFractionDigits:1})+' см</p><p><b>Черновик:</b> сектор с углом 90° по формуле длины дуги. Не учитывает швы, припуски, долевую, застёжку и проверку посадки. Печать и раскрой не готовы.</p></div>';
+    }catch(error){return '<p role="status">'+error.message+'</p>';}
   }
-  root.Skirt90Draft={build,panel};
+  function panel(values){
+    return '<section class="note" style="background:#e4ebf4;color:#142d50"><h3 style="margin:0 0 8px">Первый чертёж · сектор 90°</h3><p>Введите талию и длину — схема пересчитается автоматически.</p><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px"><label>Обхват талии, см<input data-skirt90-measure="waist" type="number" min="40" max="180" step="0.1" value="'+values.waist+'" style="display:block;width:100%;padding:10px;border:1px solid #aebdd0;border-radius:8px"></label><label>Длина юбки, см<input data-skirt90-measure="length" type="number" min="20" max="140" step="0.1" value="'+values.length+'" style="display:block;width:100%;padding:10px;border:1px solid #aebdd0;border-radius:8px"></label></div><div data-skirt90-output>'+output(values)+'</div><p>Это геометрический черновик, а не методика из книги и не готовое лекало. Для рабочего лекала нужно проверить конструкцию на ткани и примерить.</p></section>';
+  }
+  root.Skirt90Draft={build,output,panel};
 })(typeof window!=='undefined'?window:globalThis);
