@@ -51,7 +51,7 @@ function artwork(data){
  return {cmd,width:Math.max(sx+110,band+30),height:by+75};
 }
 function pages(art,format){
- if(format==='plotter'){if(art.width>821||art.height>1169)throw Error('Не помещается на А0. Выберите А4.');return [{width:841,height:1189,x:0,y:0,label:'A0 / 100% / NO FIT TO PAGE'}];}
+ if(format==='plotter'){const cols=Math.ceil((art.width-10)/811),rows=Math.ceil((art.height-10)/1159),tiles=[];for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)tiles.push({width:841,height:1189,x:c*811,y:r*1159,label:`A0 R${r+1}C${c+1} / ${rows} rows x ${cols} columns / 100% / overlap 10 mm`});return tiles;}
  const cols=Math.ceil((art.width-10)/180),rows=Math.ceil((art.height-10)/267),out=[];
  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)out.push({width:210,height:297,x:c*180,y:r*267,label:`R${r+1}C${c+1} / ${rows} rows x ${cols} columns / overlap 10 mm / 100%`});return out;
 }
@@ -62,6 +62,7 @@ function pdf(art,tiles){
   const id=4+i*2,W=t.width,H=t.height,X=x=>n(x-t.x+10),Y=y=>n(H-10-y+t.y);
   let s=`0.6 w\nBT /F1 8 Tf 28 ${n(H-5)} Td (${esc(t.label)}) Tj ET\nq\n${n(10)} ${n(10)} ${n(W-20)} ${n(H-20)} re W n\n`;
   for(const c of art.cmd){
+   if(c[0]==='D')s+='['+c.slice(1).map(n).join(' ')+'] 0 d\n';
    if(c[0]==='W')s+=`${n(c[1])} w\n`;
    if(c[0]==='K')s+=`${c.slice(1).map(x=>Number(x).toFixed(4)).join(' ')} RG\n`;
    if(c[0]==='L')s+=`${X(c[1])} ${Y(c[2])} m ${X(c[3])} ${Y(c[4])} l S\n`;
@@ -87,8 +88,8 @@ for(const id of ['print-scheme','download-scheme-pdf'])document.getElementById(i
   status.textContent=`Лекало построено по текущим меркам: ${tiles.length} листов. Талия по шву ${(d.geometry.audit.waist*2).toFixed(2)} см. Боковые швы согласованы. Печатать 100%; квадрат 10 × 10 см. ${d.reference?'Контрольный пример.':'Расчётное распределение вытачек, посадка не проверена.'} Сначала пробник.`;
  }catch(e){status.textContent='Построение остановлено: '+e.message;}
 };
-const note=document.createElement('p');note.textContent='Лекало 1:1 строится по текущим меркам. А4: нахлёст 10 мм, сборка по R (ряд) и C (колонка). Плоттер: А0. Печатать 100%, без подгонки. Контуры БЕЗ припусков: добавьте 1 см по талии, 1,5 см по бокам и середине спинки, 3 см по низу, 1 см вокруг пояса. По сгибу переда припуска нет. Вытачки не вырезать. Сначала сшейте пробник.';status.before(note);
-const consent=document.createElement('label');consent.innerHTML='<input id="experimental-print-consent" type="checkbox"> Разрешить учебный PDF с экспериментальным распределением вытачек. Не считать готовым лекалом для раскроя.';status.before(consent);
+const note=document.createElement('p');note.id='pattern-print-instructions';note.textContent='Лекало 1:1 строится по текущим меркам. А4: нахлёст 10 мм, сборка по R (ряд) и C (колонка). Плоттер: А0. Печатать 100%, без подгонки. Контуры БЕЗ припусков: добавьте 1 см по талии, 1,5 см по бокам и середине спинки, 3 см по низу, 1 см вокруг пояса. По сгибу переда припуска нет. Вытачки не вырезать. Сначала сшейте пробник.';status.before(note);
+const consent=document.createElement('label');consent.id='experimental-consent-label';consent.innerHTML='<input id="experimental-print-consent" type="checkbox"> Разрешить учебный PDF с экспериментальным распределением вытачек. Не считать готовым лекалом для раскроя.';status.before(consent);
 function refresh(){
  try{const d=build({waist:number('waist'),hip:number('hip'),hipHeight:number('hipheight'),length:number('length'),hipEaseHalf:Number(document.getElementById('hip-ease').value),material:document.getElementById('material').value});document.getElementById('calculation-note').textContent='Контуры пересчитаны по текущим меркам. Талия по шву: '+(d.geometry.audit.waist*2).toFixed(2)+' см (включая 2 см прибавки). Боковые швы согласованы. '+(d.reference?'Основа контрольного примера.':'Распределение вытачек расчётное, посадка не проверена.')+' Для первого пошива используйте пробную ткань.';}catch(e){document.getElementById('calculation-note').textContent=e.message;}
 }

@@ -5,7 +5,7 @@
   const currentProject=()=>MuellerProject.validateProject({format:'mueller-project',version:1,units:'cm',name:nameInput.value,item,measurements:item==='pants'?window.getTrouserMeasurements():Object.fromEntries(fields.map(key=>[key,number(key)])),material:item==='pants'?'woven':document.getElementById('material').value,hipEaseHalf:item==='pants'?1:Number(document.getElementById('hip-ease').value),notes:document.getElementById('fit-notes').value});
   document.getElementById('save-project').onclick=()=>{
     try{
-      const data=MuellerProject.validateProject({...currentProject(),...(item==='skirt'?{modeling:window.getSkirtModeling?.(),vent:window.getSkirtVent?.()}:{})}),blob=new Blob([JSON.stringify({...data,savedAt:new Date().toISOString(),appVersion:'0.5'},null,2)],{type:'application/json'});
+      const data=MuellerProject.validateProject({...currentProject(),...(item==='skirt'?{modeling:window.getSkirtModeling?.(),vent:window.getSkirtVent?.(),skirtKit:window.getSkirtKitSettings?.()}:{})}),blob=new Blob([JSON.stringify({...data,savedAt:new Date().toISOString(),appVersion:'0.5'},null,2)],{type:'application/json'});
       const link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;
       link.download=(data.name||(data.item==='pants'?'Bumbari-брюки':'Bumbari-юбка')).replace(/[\\/:*?"<>|\x00-\x1f]/g,'-').slice(0,80)+'.mueller.json';
       document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -35,6 +35,7 @@
     document.getElementById('fit-notes').value=data.notes;item=data.item;current=2;
     window.setSkirtModeling?.(data.modeling);
     window.setSkirtVent?.(data.vent);
+    window.setSkirtKitSettings?.(data.skirtKit);
     document.querySelectorAll('[data-item]').forEach(card=>card.classList.toggle('selected',card.dataset.item===item));
     document.getElementById('next1').disabled=false;
     // Imported items must remain visible even if a different catalogue filter was selected.
