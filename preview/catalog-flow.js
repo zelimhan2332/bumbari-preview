@@ -24,7 +24,7 @@
     home.hidden=true;catalog.hidden=false;
     document.getElementById('category-title').textContent=categories.find(c=>c[0]===button.dataset.family)[1]+' · выберите модель';
     cards.querySelectorAll('[data-item]').forEach(card=>card.hidden=card.dataset.family!==button.dataset.family);
-    next.hidden=button.dataset.family!=='lower';next.disabled=!['skirt','pants'].includes(item);
+    next.hidden=button.dataset.family!=='lower';next.disabled=!['skirt','pants'].includes(item);render();
   });
   document.getElementById('back-categories').onclick=()=>{home.hidden=false;catalog.hidden=true;next.hidden=true;};
   cards.querySelectorAll('[data-item]').forEach(card=>card.onclick=()=>{
