@@ -37,10 +37,17 @@
   points[25]={x:points[11].x+backShift,y:points[11].y};
   points[26]={x:points[25].x+backWidth/4,y:points[25].y};
   points[27]={x:points['3a'].x,y:points['3a'].y-seatShapeOffset};
+  const backGridLift=points[27].y-hipY;
+  if(backGridLift<=0)throw Error('Для задней сетки точка 27 должна находиться ниже базовой линии бёдер.');
+  points[28]={x:points[26].x,y:points[26].y-backGridLift};
+  points[29]={x:points[27].x,y:hipY};
+  points[30]={x:2*points[25].x-points[29].x,y:hipY};
   // Source step 5 (PDF21): lower back grid lines sit 2 cm outside front guides.
   points[31]={x:points[19].x+2,y:kneeY};points[32]={x:points[18].x-2,y:kneeY};
   points[33]={x:points[15].x-2,y:hemY};points['33a']={x:points[33].x,y:hemY-hemTurn};
   points[34]={x:points[16].x+2,y:hemY};points['34a']={x:points[34].x,y:hemY-hemTurn};
+  const backWaistT=(0-points[32].y)/(points[29].y-points[32].y);
+  points[35]={x:points[32].x+(points[29].x-points[32].x)*backWaistT,y:0};
   points['8b']={x:(points['8a'].x+points[17].x)/2,y:seatHeight};
   points['8c']={x:points[8].x+.5,y:seatHeight};
   const d0=points[22],d1=points[14],dx=d1.x-d0.x,dy=d1.y-d0.y,dl=Math.hypot(dx,dy),mx=(d0.x+d1.x)/2,my=(d0.y+d1.y)/2;
@@ -52,8 +59,8 @@
   const fly=through([points[20],points['8c'],points['8b'],points[17]]);
   const inseamCurve=through([points[17],points[24],points['16a'],points[16]]);
   const frontOutline=[...side,points[16],...inseamCurve.slice(0,-1).reverse(),...fly.slice(0,-1).reverse(),points[14],points[22]];
-  return {values:{...v,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset},points,front:{outline:frontOutline,side,fly,inseam:inseamCurve,dart:frontDartShape},backGuide:{points:[points[25],points[26],points[27],points[31],points[32],points[33],points['33a'],points[34],points['34a']],lowerOffset:2,widthQuarter:backWidth/4,seatShapeOffset},inseam,kneeFromSeat,frontWidth,backWidth,stepWidth,crease,hipY,kneeY,hemY,hemHalf,
-  source:'Ателье-2001, PDF19–21, печатные20–22, рис.1–5; спинка показана только вспомогательными точками и линиями',cutReady:false};
+  return {values:{...v,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset},points,front:{outline:frontOutline,side,fly,inseam:inseamCurve,dart:frontDartShape},backGuide:{points:[points[25],points[26],points[27],points[28],points[29],points[30],points[31],points[32],points[33],points['33a'],points[34],points['34a'],points[35]],lowerOffset:2,widthQuarter:backWidth/4,seatShapeOffset,gridLift:backGridLift},inseam,kneeFromSeat,frontWidth,backWidth,stepWidth,crease,hipY,kneeY,hemY,hemHalf,
+  source:'Ателье-2001, PDF19–21, печатные20–22, рис.1–5; задняя сетка частичная, полный контур не построен',cutReady:false};
  }
  function foundationArtwork(d){
   const cmd=[],p=d.points,x=n=>20+n*10,y=n=>25+n*10;
@@ -65,6 +72,7 @@
   for(const [a,b] of [[7,'15a'],[9,'16a'],[15,'15a'],[16,'16a']])line(p[a],p[b]);
   cmd.push(['K',.58,.68,.82]);
   line(p[11],p[25]);line(p[25],p[26]);line(p[26],p[27]);line(p[7],p[26]);
+  line(p[28],p[29]);line(p[29],p[30]);line(p[32],p[29]);line(p[29],p[35]);line(p[30],p[31]);
   line(p[32],p[33]);line(p[31],p[34]);line(p[33],p['33a']);line(p[34],p['34a']);
   cmd.push(['K',0,0,0]);
   line(p[20],p['8c']);line(p['8b'],p[17]);
@@ -80,7 +88,7 @@
  if(typeof module!=='undefined'){module.exports=root.TrouserFoundation;return;}
  const host=document.createElement('section');host.className='panel';host.style.marginTop='22px';
  const fields=[['waist','Талия',76],['hip','Бёдра',100],['sideLength','Длина сбоку до пола',106],['seatHeight','Высота сидения',26.5],['hemCircumference','Полный обхват низа одной штанины',42],['shortening','Укорочение от пола',3.5],['frontDart','Раствор передней вытачки',2],['frontDartLength','Длина передней вытачки',9.5],['backShift','Сдвиг задней части, шаг 4',1.5],['seatShapeOffset','Отступ по форме ягодиц: выпуклые 3, плоские 5',4]];
- host.innerHTML='<h2>Стандартные брюки · перед и базовые линии спинки</h2><p>Контур переда — шаги 1–3 «Ателье — 2001», PDF 19–20. Для спинки показаны опорные точки 25–27 и нижние направляющие 31–34а по шагам 4–5, PDF 21. Сетка и контур спинки ещё не готовы; все размеры в сантиметрах.</p><div class="form">'+fields.map(([key,label,value])=>`<label>${label}<input id="trouser-${key}" type="number" min="0" step="0.1" value="${value}"></label>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать переднюю половинку 1:1</button><p>PDF содержит только переднюю деталь. Линии спинки — вспомогательные: точки 28–30, верх и средний шов спинки не построены. Припусков и полного комплекта для раскроя нет. Мерки этого блока пока не сохраняются в файле проекта.</p>';
+ host.innerHTML='<h2>Стандартные брюки · перед и базовая сетка спинки</h2><p>Контур переда — шаги 1–3 «Ателье — 2001», PDF 19–20. Для спинки показаны только опорная сетка и направляющие шагов 4–5, PDF 21. Контур и посадка спинки ещё не готовы; все размеры в сантиметрах.</p><div class="form">'+fields.map(([key,label,value])=>`<label>${label}<input id="trouser-${key}" type="number" min="0" step="0.1" value="${value}"></label>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать переднюю половинку 1:1</button><p>PDF содержит только переднюю деталь. Линии спинки — вспомогательные, без контура кроя и проверки посадки. Припусков и полного комплекта для раскроя нет. Мерки этого блока пока не сохраняются в файле проекта.</p>';
  document.querySelector('.shell').append(host);
  const values=()=>Object.fromEntries(fields.map(([key])=>[key,Number(document.getElementById('trouser-'+key).value)]));
  function refresh(){
