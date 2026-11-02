@@ -15,7 +15,7 @@ function check(values,settings){
  assert(Math.abs(cb.maxX-cb.minX-belt.length-2*s)<1e-8);assert(Math.abs(cb.maxY-cb.minY-belt.width-2*s)<1e-8);
  if(k.settings.vent){assert.equal(bb.minX,-k.settings.vent.width,'vent total width must not double-count seam allowance');assert(b.cut.some(p=>p.x===-k.settings.vent.width&&p.y===values.length-k.settings.vent.ventLength-2));}else assert(Math.abs(bb.minX+s)<1e-8);
  const a=K.artwork(k);assert(K.svg(a).includes('спинка и пояс'));assert(K.svg(a,'B').includes(a.panels.B.join(' ')));
- const beltOriginX=a.panels.C[0]+3-cb.minX*10,beltOriginY=a.panels.C[1]+12-cb.minY*10;
+ const beltOriginX=a.panels.C[0]+3-cb.minX*10,beltOriginY=a.panels.C[1]+28-cb.minY*10;
  for(const waistPosition of [k.audit.backWaist,k.audit.backWaist+k.audit.frontWaist,k.audit.backWaist+2*k.audit.frontWaist])assert(a.cmd.some(c=>c[0]==='L'&&Math.abs(c[1]-beltOriginX-waistPosition*10)<1e-7&&Math.abs(c[2]-beltOriginY)<1e-7&&Math.abs(c[4]-beltOriginY-5)<1e-7),'waistband notches match actual front and back waist seams');
  for(const format of ['a4','plotter']){
   const pages=P.pages(a,format),bytes=P.pdf(a,pages),pdf=Buffer.from(bytes).toString();

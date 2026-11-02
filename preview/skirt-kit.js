@@ -140,15 +140,18 @@
   const notesY=squareY+15;text(squareX+125,notesY,'BLACK: CUT LINE');text(squareX+125,notesY+7,'BLUE DASH: SEAM / FOLD');text(squareX+125,notesY+14,'DO NOT CUT DARTS');
   text(5,beltOrigin.y+cb.maxY*10+12,kit.settings.allowances?`ALLOWANCES INCLUDED: SEAMS ${kit.settings.seamAllowance} cm; HEM ${kit.settings.hemAllowance} cm; FRONT FOLD 0`:'NO SEAM OR HEM ALLOWANCES / VENT EXTENSION INCLUDED');
   text(5,beltOrigin.y+cb.maxY*10+19,'BACK: 2 MIRRORED PIECES FROM TEMPLATE B / NO LINING / PRINT 100%');
-  const panels={};for(const [p,o] of [[front,frontOrigin],[back,backOrigin],[belt,beltOrigin]]){const b=bounds(p.cut);panels[p.id]=[o.x+b.minX*10-3,o.y+b.minY*10-12,(b.maxX-b.minX)*10+6,(b.maxY-b.minY)*10+18];}
+  const panels={};for(const [p,o] of [[front,frontOrigin],[back,backOrigin],[belt,beltOrigin]]){const b=bounds(p.cut);panels[p.id]=[o.x+b.minX*10-3,o.y+b.minY*10-28,(b.maxX-b.minX)*10+6,(b.maxY-b.minY)*10+34];}
   return {cmd,width:Math.max(beltOrigin.x+cb.maxX*10+5,backOrigin.x+bb.maxX*10+5),height:squareY+115,panels};
  }
  function svg(art,piece){
   let ink='#000',width=.45,dash='';const drawn=[];
   for(const c of art.cmd){if(c[0]==='K')ink='#'+c.slice(1).map(n=>Math.round(n*255).toString(16).padStart(2,'0')).join('');
    if(c[0]==='W')width=c[1];if(c[0]==='D')dash=c.slice(1).join(' ');
-   if(c[0]==='L')drawn.push(`<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" fill="none" stroke="${ink}" stroke-width="${width}" stroke-dasharray="${dash}"/>`);
-   if(c[0]==='T')drawn.push(`<text x="${c[1]}" y="${c[2]}" font-family="Arial,sans-serif" font-size="3.2" fill="#203451">${c[3].replace(/&/g,'&amp;').replace(/</g,'&lt;')}</text>`);
+   if(c[0]==='L')drawn.push(`<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" fill="none" stroke="${ink}" stroke-width="${Math.max(.8,width*2.7)}" vector-effect="non-scaling-stroke" stroke-dasharray="${dash}"/>`);
+   if(c[0]==='T'){
+    const key=c[3].slice(0,2),labels={'A:':'Перед · 1 на сгибе','B:':'Спинка · 2 зеркальные детали','C:':'Пояс · 1 деталь'},label=labels[key]||(c[3]==='CONTROL 100 x 100 mm'?'Контроль 100 × 100 мм':'');
+    if(label)drawn.push(`<text x="${c[1]}" y="${c[2]}" font-family="Arial,sans-serif" font-size="${key==='C:'?14:18}" fill="#203451">${label}</text>`);
+   }
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${piece?art.panels[piece].join(' '):`0 0 ${art.width} ${art.height}`}" role="img" aria-label="Комплект прямой юбки: ${piece==='A'?'перед на сгиб':piece==='B'?'спинка на две зеркальные детали':piece==='C'?'пояс':'перед, спинка и пояс'}">${drawn.join('')}</svg>`;
  }
