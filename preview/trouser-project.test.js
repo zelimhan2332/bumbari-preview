@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const P=require('./project-file');
+const measurements={waist:76,hip:100,sideLength:106,seatHeight:26.5,hemCircumference:42,shortening:3.5,frontDart:2,frontDartLength:9.5,backShift:1.5,seatShapeOffset:4};
+const input={format:'mueller-project',version:1,units:'cm',name:'Брюки',item:'pants',measurements,material:'woven',hipEaseHalf:1,notes:'Пробник'};
+const saved=P.validateProject(input);
+assert.deepEqual(P.parseProject(JSON.stringify(saved)),saved);
+assert.deepEqual(saved.measurements,measurements);
+assert.throws(()=>P.validateProject({...input,measurements:{...measurements,seatHeight:110}}));
+assert.throws(()=>P.validateProject({...input,measurements:{...measurements,frontDartLength:5}}));
+assert.throws(()=>P.validateProject({...input,measurements:{...measurements,sideLength:undefined}}));
+assert.throws(()=>P.validateProject({...input,vent:{width:5,ventLength:16}}));
+assert.throws(()=>P.validateProject({...input,item:'dress'}));
+assert.throws(()=>P.parseProject(JSON.stringify({...input,measurements:{...measurements,hip:'100'}})));
+console.log('Trouser project: round trip, complete measurements, invalid geometry and foreign skirt settings OK');

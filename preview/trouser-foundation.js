@@ -88,21 +88,58 @@
  if(typeof module!=='undefined'){module.exports=root.TrouserFoundation;return;}
  const host=document.createElement('section');host.className='panel';host.style.marginTop='22px';
  const fields=[['waist','Талия',76],['hip','Бёдра',100],['sideLength','Длина сбоку до пола',106],['seatHeight','Высота сидения',26.5],['hemCircumference','Полный обхват низа одной штанины',42],['shortening','Укорочение от пола',3.5],['frontDart','Раствор передней вытачки',2],['frontDartLength','Длина передней вытачки',9.5],['backShift','Сдвиг задней части, шаг 4',1.5],['seatShapeOffset','Отступ по форме ягодиц: выпуклые 3, плоские 5',4]];
- host.innerHTML='<h2>Стандартные брюки · перед и базовая сетка спинки</h2><p>Контур переда — шаги 1–3 «Ателье — 2001», PDF 19–20. Для спинки показаны только опорная сетка и направляющие шагов 4–5, PDF 21. Контур и посадка спинки ещё не готовы; все размеры в сантиметрах.</p><div class="form">'+fields.map(([key,label,value])=>`<label>${label}<input id="trouser-${key}" type="number" min="0" step="0.1" value="${value}"></label>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать переднюю половинку 1:1</button><p>PDF содержит только переднюю деталь. Линии спинки — вспомогательные, без контура кроя и проверки посадки. Припусков и полного комплекта для раскроя нет. Мерки этого блока пока не сохраняются в файле проекта.</p>';
- document.querySelector('.shell').append(host);
- const values=()=>Object.fromEntries(fields.map(([key])=>[key,Number(document.getElementById('trouser-'+key).value)]));
+ host.innerHTML='<div class="form">'+fields.map(([key,label,value])=>`<div class="field"><label for="trouser-${key}">${label}</label><div class="wrap"><input id="trouser-${key}" inputmode="decimal" value="${value}"><em>см</em></div></div>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать переднюю половинку 1:1</button>';
+
+ // Keep existing skirt controls and their listeners together; use the same four steps.
+ const skirtPanels={},trouserPanels={};
+ for(const step of [2,3,4]){
+  const section=document.getElementById('s'+step),skirt=document.createElement('div'),pants=document.createElement('div');
+  skirt.dataset.itemPanel='skirt';pants.dataset.itemPanel='pants';pants.hidden=true;
+  while(section.firstChild)skirt.append(section.firstChild);
+  section.append(skirt,pants);skirtPanels[step]=skirt;trouserPanels[step]=pants;
+ }
+ const heading=(panel,title,copy)=>{const h=document.createElement('h2'),p=document.createElement('p');h.textContent=title;p.textContent=copy;panel.append(h,p);};
+ const action=(panel,label,step,validate=false)=>{const b=document.createElement('button');b.className='primary';b.textContent=label;b.onclick=()=>{try{if(validate)buildTrouserFoundation(values());go(step);}catch(e){document.getElementById('trouser-error').textContent=e.message;}};let actions=panel.querySelector('.actions');if(!actions){actions=document.createElement('div');actions.className='actions';panel.append(actions);}actions.append(b);};
+ heading(trouserPanels[2],'Мерки для классических брюк','Все размеры в сантиметрах. Сейчас доступны передняя половинка и вспомогательные линии спинки; полный комплект ещё не готов.');
+ trouserPanels[2].append(host.querySelector('.form'));
+ const error=document.createElement('p');error.id='trouser-error';error.setAttribute('role','alert');trouserPanels[2].append(error);
+ action(trouserPanels[2],'← Выбрать изделие',1);action(trouserPanels[2],'Построить →',3,true);
+ heading(trouserPanels[3],'Чертёж основы брюк','Передняя половинка и направляющие спинки. Это неполный комплект, без припусков; посадка не проверена.');
+ trouserPanels[3].append(host.querySelector('#trouser-result'),host.querySelector('#trouser-preview'));
+ action(trouserPanels[3],'← Изменить мерки',2);action(trouserPanels[3],'Печать →',4,true);
+ heading(trouserPanels[4],'Печать передней половинки брюк','Учебный PDF 1:1 на A4. Содержит переднюю деталь и вспомогательные линии спинки. Задней детали и припусков нет — для раскроя полного изделия не подходит. Печатайте 100%, без подгонки; проверьте квадрат 100 × 100 мм.');
+ trouserPanels[4].append(host.querySelector('#trouser-export'));
+ const printStatus=document.createElement('p');printStatus.id='trouser-print-status';printStatus.setAttribute('role','status');trouserPanels[4].append(printStatus);
+ action(trouserPanels[4],'← К чертежу',3);
+
+ const values=()=>Object.fromEntries(fields.map(([key])=>{const text=document.getElementById('trouser-'+key).value.trim();return [key,text===''?NaN:Number(text.replace(',','.'))];}));
  function refresh(){
   const out=document.getElementById('trouser-result'),preview=document.getElementById('trouser-preview');
-  try{const d=buildTrouserFoundation(values()),art=foundationArtwork(d),f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
+  try{document.getElementById('trouser-error').textContent='';const d=buildTrouserFoundation(values()),art=foundationArtwork(d),f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
    out.textContent=`Длина шага: ${f(d.inseam)}; от сидения до колена: ${f(d.kneeFromSeat)}; ширина передней сетки: ${f(d.frontWidth)}; ширина шага переда: ${f(d.stepWidth)}; линия бёдер от талии: ${f(d.hipY)} см.`;
    let stroke=.6,ink='#244d80';const drawn=art.cmd.map(c=>{if(c[0]==='W'){stroke=c[1];return '';}if(c[0]==='K'){ink='#'+c.slice(1).map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');return '';}if(c[0]==='L')return `<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" stroke="${ink}" fill="none" stroke-width="${stroke}"/>`;return '';}).join('');
    preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж передней половинки брюк с контуром и точками">${drawn}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
-  }catch(e){out.textContent=e.message;preview.replaceChildren();}
+  }catch(e){out.textContent=e.message;document.getElementById('trouser-error').textContent=e.message;preview.replaceChildren();}
  }
- host.addEventListener('input',refresh);
+
+ root.getTrouserMeasurements=values;
+ root.setTrouserMeasurements=data=>{buildTrouserFoundation(data);for(const [key] of fields)document.getElementById('trouser-'+key).value=data[key];refresh();};
+ const persist=()=>localStorage.setItem('bumbari-trouser-measures-v1',JSON.stringify(values()));
+ trouserPanels[2].addEventListener('input',()=>{refresh();persist();});
+ for(const input of trouserPanels[2].querySelectorAll('input')){input.type='text';input.inputMode='decimal';}
+ try{const saved=JSON.parse(localStorage.getItem('bumbari-trouser-measures-v1')||'null');if(saved)root.setTrouserMeasurements(saved);}catch{/* Ignore damaged local cache; project imports still report errors. */}
+ root.renderTrouserFlow=()=>{
+  const pants=item==='pants';
+  for(const step of [2,3,4]){skirtPanels[step].hidden=pants;trouserPanels[step].hidden=!pants;}
+  if(!pants)return false;
+  document.body.classList.toggle('measure-screen',current===2);document.body.classList.toggle('catalog-screen',current===1);
+  for(let step=1;step<=4;step++){document.getElementById('s'+step).classList.toggle('hidden',step!==current);document.querySelector('[data-step="'+step+'"]').classList.toggle('active',step===current);}
+  refresh();return true;
+ };
+
  document.getElementById('trouser-export').onclick=()=>{
   try{const art=foundationArtwork(buildTrouserFoundation(values())),P=root.MuellerPattern,bytes=P.pdf(art,P.pages(art,'a4')),url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
-   const a=document.createElement('a');a.href=url;a.download='bumbari-trouser-front-half.pdf';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
-  }catch(e){document.getElementById('trouser-result').textContent=e.message;}
- };refresh();
+   const a=document.createElement('a');a.href=url;a.download='bumbari-trouser-front-half.pdf';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);document.getElementById('trouser-print-status').textContent='PDF передней половинки подготовлен. Печатайте 100%; проверьте квадрат 100 × 100 мм. Комплект неполный, без припусков.';
+  }catch(e){document.getElementById('trouser-print-status').textContent=e.message;}
+ };render();
 })(typeof window!=='undefined'?window:globalThis);
