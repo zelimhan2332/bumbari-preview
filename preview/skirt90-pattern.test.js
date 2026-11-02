@@ -1,0 +1,37 @@
+const assert=require('node:assert/strict');
+require('./skirt90-pattern.js');
+const {build,output}=globalThis.Skirt90Draft;
+const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-9,`${a} != ${b}`);
+const inputs={waist:72,hip:100,hipHeight:20,length:60};
+const d=build(inputs);
+// Independent known circle: radius 10, full half-circle waist 10*pi.
+// Use radius 20 to stay inside the supported measurement range.
+const circle=build({...inputs,waist:20*Math.PI});
+close(circle.waistRadius,20);
+close(circle.halfWaistArc,10*Math.PI);
+close(circle.hipArc,40*Math.PI);
+close(circle.halfHemArc,40*Math.PI);
+close(d.waistRadius,22.91831180523293);
+close(d.arcAtWaist,72);
+close(d.halfWaistArc*2,72);
+close(d.halfHipArc*2,d.hipArc);
+close(d.halfHemArc*2,d.hemArc);
+close(d.hipArc,134.83185307179588);
+close(d.hipEase,34.83185307179588);
+assert.equal(d.fullAngle,180);
+assert.equal(d.angle,90);
+assert.equal(d.cutOnFold,true);
+assert.equal(d.cutReady,false);
+const wider=build({...inputs,waist:82});
+close(wider.hipArc-d.hipArc,10);
+const longer=build({...inputs,length:70});
+close(longer.hemArc-d.hemArc,10*Math.PI);
+assert.equal(longer.hipArc,d.hipArc);
+const tight=build({waist:40,hip:100,hipHeight:10,length:60});
+assert.ok(tight.hipEase<0);
+assert.match(output({waist:40,hip:100,hipHeight:10,length:60}),/не хватает/);
+assert.match(output(inputs),/СГИБ/);
+assert.match(output(inputs),/Средний шов спинки/);
+assert.throws(()=>build({...inputs,hipHeight:60}));
+assert.throws(()=>build({...inputs,waist:NaN}));
+console.log('Half-circle skirt geometry OK');
