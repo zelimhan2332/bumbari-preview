@@ -1,0 +1,84 @@
+{
+  "library_root": "",
+  "ocr_cache_root": "",
+  "books": [
+    {
+      "id": "b01",
+      "filename": "07_M_Myuler_i_syn_-_Osnovnye_konstruktsii_Sbornik_Biblioteka_zhurnala_Atelye_-_2005.pdf",
+      "title": "Основные конструкции (2005)",
+      "pdf_pages": 155,
+      "sha256": "bc7daed171906901db1c2190c0745a59f446e7c0695d70166010fb711adb3859"
+    },
+    {
+      "id": "b02",
+      "filename": "M_Myuller_i_syn_-_Kak_rabotat_s_naturalnoy_kozh.pdf",
+      "title": "Натуральная кожа",
+      "pdf_pages": 64,
+      "sha256": "3513ec70f6ab90dd4985d1ef7729eddfc7db21bf78d023690fe39fc5c96a280c"
+    },
+    {
+      "id": "b03",
+      "filename": "M_Myuller_i_syn_Buduarnoe_belye.pdf",
+      "title": "Будуарное белье",
+      "pdf_pages": 18,
+      "sha256": "c80c55ea7a7b40710a2963fc2d56759873d4cba5118970b6445b176f729dd373"
+    },
+    {
+      "id": "b04",
+      "filename": "M_Myuller_i_syn_Ispravlenie_defektov_posadki.pdf",
+      "title": "Дефекты посадки (2011)",
+      "pdf_pages": 150,
+      "sha256": "7534abf5ae6fb8888445c7f875648f9b839bdbe805e0d6b7c6edef84dafcb1cb"
+    },
+    {
+      "id": "b05",
+      "filename": "M_Myuller_i_syn_Muzhskaya_odezhda_Klassika_i_avangard.pdf",
+      "title": "Мужская одежда: классика и авангард (2015)",
+      "pdf_pages": 194,
+      "sha256": "c8f16332a61e2d3d586cfded2f5ea82a63ceec134610bda78d46cedb5955401c"
+    },
+    {
+      "id": "b06",
+      "filename": "M_Myuller_i_syn_Muzhskaya_odezhda_ot_A_do_Ya.pdf",
+      "title": "Мужская одежда от А до Я (2010)",
+      "pdf_pages": 172,
+      "sha256": "942f7ccd5843b142cc6e3501cdc286f925ab9da9c6725857a31f936214ad9dcd"
+    },
+    {
+      "id": "b07",
+      "filename": "M_Myuller_i_syn_Svadebnye_i_vechernie_platya.pdf",
+      "title": "Свадебные и вечерние платья: том I (2008)",
+      "pdf_pages": 218,
+      "sha256": "98ee1360c18fe0d08315e6fcfa9614a304b2d3a6f3362cdbbbda643e32e56cf3"
+    },
+    {
+      "id": "b08",
+      "filename": "M_Myuller_i_syn_Zhakety_i_Palto.pdf",
+      "title": "Жакеты и пальто",
+      "pdf_pages": 104,
+      "sha256": "307a935c73abc2d9845a79c5ca3653cfa81db83cb69eb486b0154ef3f31c3397"
+    },
+    {
+      "id": "b09",
+      "filename": "Myuller_M_i_syn_Konstruirovanie_Muzhskaya_odezhda_Bazovy_kurs.pdf",
+      "title": "Мужская одежда: базовый курс (2022)",
+      "pdf_pages": 156,
+      "sha256": "4ace1fc13f16f3eb046743d6b315b41c19fa1934b201863b5002ff175c18e160"
+    },
+    {
+      "id": "b10",
+      "filename": "Sbornik_Atelye_Myuller_i_syn_2001_Tekhnika_Kroya.pdf",
+      "title": "Ателье — 2001. Техника кроя",
+      "pdf_pages": 168,
+      "sha256": "a2e73dfebcad2da04b888b24edcb4b4d513d5f7977b8284f633801ad582c33f9",
+      "desktop_fallback": true
+    },
+    {
+      "id": "b11",
+      "filename": "Новая папка/Sbornik_Atelye_2004.pdf",
+      "title": "Ателье — 2004. Техника кроя (титул: Москва 2014)",
+      "pdf_pages": 172,
+      "sha256": "9fd982df59ce8191a5b4194a26a479301d197bc28625afd96f959f28bc044330"
+    }
+  ]
+}

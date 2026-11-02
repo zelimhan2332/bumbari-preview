@@ -1,0 +1,28 @@
+{
+  "status": "partial_reference_not_an_implemented_pattern",
+  "source_file": "07_M_Myuler_i_syn_-_Osnovnye_konstruktsii_Sbornik_Biblioteka_zhurnala_Atelye_-_2005.pdf",
+  "pdf_page": 3,
+  "printed_page": 1,
+  "units": "cm",
+  "measurements": {
+    "waist_circumference": 76,
+    "hip_circumference": 100,
+    "hip_height": 20.8,
+    "skirt_length": 61.5
+  },
+  "verified_reference_values": {
+    "half_hip_with_selected_ease": 51,
+    "half_waist_with_selected_ease": 39,
+    "total_dart_intake": 12,
+    "side_intake": 7,
+    "front_dart_intake": 2,
+    "back_dart_intake": 3
+  },
+  "checks": [
+    "100 / 2 + 1 = 51",
+    "76 / 2 + 1 = 39",
+    "51 - 39 = 12",
+    "7 + 2 + 3 = 12"
+  ],
+  "remaining_work": "Read subsequent construction pages, verify point geometry, dart positions and lengths, side shaping and complete all pieces before implementing a production pattern."
+}
