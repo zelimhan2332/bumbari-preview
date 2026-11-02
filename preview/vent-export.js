@@ -5,9 +5,9 @@
  const build=node?require('./skirt-vent').buildVent:root.buildVent;
  function ventArtwork(values){
   const v=build(values),cmd=[],line=(...p)=>cmd.push(['L',...p]),text=(...p)=>cmd.push(['T',...p]);
-  text(10,10,'BUMBARI / VENT CONSTRUCTION AID / 1:1');
-  text(10,17,'NOT COMPLETE PATTERN PIECES / NO SEAM OR HEM ALLOWANCES');
-  text(10,24,`Vent ${v.ventLength} cm; extension ${v.width} cm; top ${v.top} cm below waist`);
+  text(10,10,'БУМБАРИ / ПОСТРОЕНИЕ ШЛИЦЫ / 1:1');
+  text(10,17,'НЕ ПОЛНЫЕ ДЕТАЛИ СПИНКИ / БЕЗ ПРИПУСКОВ ШВОВ И НИЗА');
+  text(10,24,`ДЛИНА ШЛИЦЫ ${v.ventLength} СМ; ШИРИНА ${v.width} СМ; НАЧАЛО НИЖЕ ТАЛИИ НА ${v.top} СМ`);
   for(const [index,side] of ['right','left'].entries()){
    const x=20+v.width*10+index*(v.width*20+30),y=45;
    const edge=v.backSeamEdges[side];
@@ -15,11 +15,11 @@
    for(let dy=v.top*10;dy<v.length*10;dy+=8)line(x,y+dy,x,y+Math.min(dy+4,v.length*10));
    const sign=side==='right'?1:-1;
    line(x,y+v.top*10,x+sign*v.width*10,y+(v.top-1.5)*10);
-   text(x-v.width*10,y+v.length*10+10,side.toUpperCase()+' / CENTRE BACK EDGE ONLY');
+   text(x-v.width*10,y+v.length*10+10,(side==='right'?'ПРАВЫЙ':'ЛЕВЫЙ')+' КРАЙ СРЕДНЕГО ШВА СПИНКИ');
   }
   const sx=25,sy=65+v.length*10;
   line(sx,sy,sx+100,sy);line(sx+100,sy,sx+100,sy+100);line(sx+100,sy+100,sx,sy+100);line(sx,sy+100,sx,sy);
-  text(sx,sy+110,'CONTROL 100 x 100 mm / PRINT 100%');
+  text(sx,sy+110,'КОНТРОЛЬНЫЙ КВАДРАТ 100 × 100 ММ / ПЕЧАТАТЬ 100%');
   return {cmd,width:Math.max(220,v.width*40+90),height:sy+120};
  }
  root.ventArtwork=ventArtwork;

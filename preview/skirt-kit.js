@@ -72,7 +72,7 @@
    cut.splice(cut.length-1,1,{x:-width,y:end.y},{x:-width,y:top-raise},{x:upper.x,y:top-raise});
   }
   if(!simple(cut))throw Error('Контур детали пересекается.');
-  return {id:back?'B':'A',name:back?'BACK / CUT 2 MIRRORED':'FRONT / CUT 1 ON FOLD',count:back?2:1,onFold:!back,seam,cut,kinds,darts:n.darts,waist:n.waist,side:n.side,hipHeight:values.hipHeight,length:values.length,halfWidth:half};
+  return {id:back?'B':'A',name:back?'СПИНКА / ВЫКРОИТЬ 2 ЗЕРКАЛЬНО':'ПЕРЕД / ВЫКРОИТЬ 1 ПО СГИБУ',count:back?2:1,onFold:!back,seam,cut,kinds,darts:n.darts,waist:n.waist,side:n.side,hipHeight:values.hipHeight,length:values.length,halfWidth:half};
  }
  function build(values,options={}){
   const settings={allowances:options.allowances??true,seamAllowance:options.seamAllowance??2,hemAllowance:options.hemAllowance??4,zipperLength:options.zipperLength??20,vent:options.vent};
@@ -84,7 +84,7 @@
   const base=P.build(values),half=base.geometry.half;
   const front=makePiece(base.geometry.front,values,half,false,settings),back=makePiece(base.geometry.back,values,half,true,settings);
   const belt=beltBuilder({waistSeam:base.geometry.audit.waist*2}),s=settings.allowances?settings.seamAllowance:0;
-  const waistband={id:'C',name:'WAISTBAND / CUT 1 + FUSIBLE',count:1,onFold:false,length:belt.length,width:belt.cutWidth,overlap:belt.overlap,
+  const waistband={id:'C',name:'ПОЯС / ВЫКРОИТЬ 1 + ПРОКЛАДКА',count:1,onFold:false,length:belt.length,width:belt.cutWidth,overlap:belt.overlap,
    seam:[{x:0,y:0},{x:belt.length,y:0},{x:belt.length,y:belt.cutWidth},{x:0,y:belt.cutWidth}],
    cut:[{x:-s,y:-s},{x:belt.length+s,y:-s},{x:belt.length+s,y:belt.cutWidth+s},{x:-s,y:belt.cutWidth+s}]};
   const frontWaist=front.waist.reduce((sum,c)=>sum+E.curveLength(c),0),backWaist=back.waist.reduce((sum,c)=>sum+E.curveLength(c),0);
@@ -103,11 +103,11 @@
   if(squareY%267>167)squareY=Math.ceil(squareY/267)*267+5;
   const text=(x,y,t)=>cmd.push(['T',x,y,t]),line=(a,b,o)=>cmd.push(['L',o.x+a.x*10,o.y+a.y*10,o.x+b.x*10,o.y+b.y*10]);
   const chain=(points,o,closed=true)=>{for(let i=1;i<points.length;i++)line(points[i-1],points[i],o);if(closed)line(points.at(-1),points[0],o);};
-  text(5,10,'BUMBARI / STRAIGHT SKIRT / UNLINED / 1:1');
-  text(5,17,`W ${kit.values.waist} / H ${kit.values.hip} / L ${kit.values.length} cm / ${kit.version}`);
-  text(5,24,'SOURCE: ATELIER 2001 PDF5-7,9,16 / DIGITAL CURVES AND OFFSETS');
-  text(5,31,kit.reference?'REFERENCE NUMERIC CASE / PRINT AND FIT A TOILE FIRST':'EXPERIMENTAL DART DISTRIBUTION / FIT A TOILE FIRST');
-  text(350,31,`A4 CONTROL SQUARE: R${Math.floor(squareY/267)+1}C1`);
+  text(5,10,'БУМБАРИ / ПРЯМАЯ ЮБКА / БЕЗ ПОДКЛАДКИ / 1:1');
+  text(5,17,`ОТ ${kit.values.waist} / ОБ ${kit.values.hip} / ДЮ ${kit.values.length} СМ`);
+  text(5,24,'ИСТОЧНИК: АТЕЛЬЕ 2001, ФАЙЛЫ 5–7, 9, 16 / ЦИФРОВОЕ УРАВНИВАНИЕ КОНТУРОВ');
+  text(5,31,kit.reference?'КОНТРОЛЬНЫЙ ПРИМЕР / СНАЧАЛА РАСПЕЧАТАТЬ И СШИТЬ МАКЕТ':'РАСЧЁТНОЕ РАСПРЕДЕЛЕНИЕ ВЫТАЧЕК / СНАЧАЛА МАКЕТ');
+  text(350,31,`КОНТРОЛЬНЫЙ КВАДРАТ А4: РЯД ${Math.floor(squareY/267)+1}, КОЛОНКА 1`);
   for(const [piece,o] of [[front,frontOrigin],[back,backOrigin],[belt,beltOrigin]]){
    const b=bounds(piece.cut);text(o.x+b.minX*10,o.y+b.minY*10-7,`${piece.id}: ${piece.name}`);
    cmd.push(['K',0,0,0],['W',.45],['D']);chain(piece.cut,o);
@@ -118,28 +118,28 @@
     cmd.push(['D',3,1]);line({x:0,y:piece.width/2},{x:piece.length,y:piece.width/2},o);cmd.push(['D']);
     line({x:piece.length-piece.overlap,y:0},{x:piece.length-piece.overlap,y:piece.width},o);
     for(const x of [kit.audit.backWaist,kit.audit.backWaist+kit.audit.frontWaist,kit.audit.backWaist+2*kit.audit.frontWaist]){line({x,y:0},{x,y:.5},o);line({x,y:piece.width},{x,y:piece.width-.5},o);}
-    text(o.x+10,o.y+18,`FOLD / FINISHED WIDTH 3 cm / OVERLAP 3 cm / SEAM MATCH ${kit.audit.beltSeam.toFixed(2)} cm`);
+    text(o.x+10,o.y+18,`СГИБ / ГОТОВАЯ ШИРИНА 3 СМ / ЗАХОД 3 СМ / ДЛИНА ШВА ${kit.audit.beltSeam.toFixed(2)} СМ`);
    }else{
     const y=piece.hipHeight,side={x:piece.halfWidth,y};line({x:0,y},side,o);
     line({x:side.x-.4,y},{x:side.x+((kit.settings.allowances)?kit.settings.seamAllowance:0),y},o);
     const gx=piece.halfWidth*.5,gy=Math.max(y+3,piece.length*.55),end=Math.min(piece.length-4,gy+15);
-    line({x:gx,y:gy},{x:gx,y:end},o);line({x:gx,y:gy},{x:gx-.4,y:gy+1},o);line({x:gx,y:gy},{x:gx+.4,y:gy+1},o);text(o.x+gx*10+5,o.y+(gy+end)*5,'GRAIN');
-    if(piece.onFold){text(o.x+4,o.y+piece.length*7,'FOLD / NO ALLOWANCE');}
+    line({x:gx,y:gy},{x:gx,y:end},o);line({x:gx,y:gy},{x:gx-.4,y:gy+1},o);line({x:gx,y:gy},{x:gx+.4,y:gy+1},o);text(o.x+gx*10+5,o.y+(gy+end)*5,'ДОЛЕВАЯ');
+    if(piece.onFold){text(o.x+4,o.y+piece.length*7,'СГИБ / БЕЗ ПРИПУСКА');}
     else{
-     line({x:-.5,y:kit.settings.zipperLength},{x:.5,y:kit.settings.zipperLength},o);text(o.x+5,o.y+kit.settings.zipperLength*10-5,'ZIP END');
+     line({x:-.5,y:kit.settings.zipperLength},{x:.5,y:kit.settings.zipperLength},o);text(o.x+5,o.y+kit.settings.zipperLength*10-5,'КОНЕЦ МОЛНИИ');
      if(kit.settings.vent){const top=piece.length-kit.settings.vent.ventLength,w=kit.settings.vent.width;
       cmd.push(['D',3,1]);line({x:0,y:top},{x:0,y:piece.length},o);line({x:0,y:top},{x:-w,y:top-1.5},o);cmd.push(['D']);
-      text(o.x+5,o.y+top*10+5,`VENT ${kit.settings.vent.ventLength} cm / FOLD AT CENTER BACK`);
+      text(o.x+5,o.y+top*10+5,`ШЛИЦА ${kit.settings.vent.ventLength} СМ / СГИБ ПО СЕРЕДИНЕ СПИНКИ`);
      }
     }
    }
   }
   cmd.push(['K',0,0,0],['W',.3],['D']);
   chain([{x:0,y:0},{x:10,y:0},{x:10,y:10},{x:0,y:10}],{x:squareX,y:squareY});
-  text(squareX,squareY-5,'CONTROL 100 x 100 mm');
-  const notesY=squareY+15;text(squareX+125,notesY,'BLACK: CUT LINE');text(squareX+125,notesY+7,'BLUE DASH: SEAM / FOLD');text(squareX+125,notesY+14,'DO NOT CUT DARTS');
-  text(5,beltOrigin.y+cb.maxY*10+12,kit.settings.allowances?`ALLOWANCES INCLUDED: SEAMS ${kit.settings.seamAllowance} cm; HEM ${kit.settings.hemAllowance} cm; FRONT FOLD 0`:'NO SEAM OR HEM ALLOWANCES / VENT EXTENSION INCLUDED');
-  text(5,beltOrigin.y+cb.maxY*10+19,'BACK: 2 MIRRORED PIECES FROM TEMPLATE B / NO LINING / PRINT 100%');
+  text(squareX,squareY-5,'КОНТРОЛЬНЫЙ КВАДРАТ 100 × 100 ММ');
+  const notesY=squareY+15;text(squareX+125,notesY,'ЧЁРНАЯ ЛИНИЯ: СРЕЗ');text(squareX+125,notesY+7,'СИНЯЯ ШТРИХОВАЯ: ШОВ / СГИБ');text(squareX+125,notesY+14,'ВЫТАЧКИ НЕ ВЫРЕЗАТЬ');
+  text(5,beltOrigin.y+cb.maxY*10+12,kit.settings.allowances?`ПРИПУСКИ ВКЛЮЧЕНЫ: ШВЫ ${kit.settings.seamAllowance} СМ; НИЗ ${kit.settings.hemAllowance} СМ; СГИБ ПЕРЕДА 0`:'БЕЗ ПРИПУСКОВ ШВОВ И НИЗА / РАСШИРЕНИЕ ШЛИЦЫ ВКЛЮЧЕНО');
+  text(5,beltOrigin.y+cb.maxY*10+19,'СПИНКА: 2 ЗЕРКАЛЬНЫЕ ДЕТАЛИ ПО ЛЕКАЛУ Б / БЕЗ ПОДКЛАДКИ / ПЕЧАТАТЬ 100%');
   const panels={};for(const [p,o] of [[front,frontOrigin],[back,backOrigin],[belt,beltOrigin]]){const b=bounds(p.cut);panels[p.id]=[o.x+b.minX*10-3,o.y+b.minY*10-28,(b.maxX-b.minX)*10+6,(b.maxY-b.minY)*10+34];}
   return {cmd,width:Math.max(beltOrigin.x+cb.maxX*10+5,backOrigin.x+bb.maxX*10+5),height:squareY+115,panels};
  }
@@ -149,7 +149,7 @@
    if(c[0]==='W')width=c[1];if(c[0]==='D')dash=c.slice(1).join(' ');
    if(c[0]==='L')drawn.push(`<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" fill="none" stroke="${ink}" stroke-width="${Math.max(.8,width*2.7)}" vector-effect="non-scaling-stroke" stroke-dasharray="${dash}"/>`);
    if(c[0]==='T'){
-    const key=c[3].slice(0,2),labels={'A:':'Перед · 1 на сгибе','B:':'Спинка · 2 зеркальные детали','C:':'Пояс · 1 деталь'},label=labels[key]||(c[3]==='CONTROL 100 x 100 mm'?'Контроль 100 × 100 мм':'');
+    const key=c[3].slice(0,2),labels={'A:':'Перед · 1 на сгибе','B:':'Спинка · 2 зеркальные детали','C:':'Пояс · 1 деталь'},label=labels[key]||(c[3]==='КОНТРОЛЬНЫЙ КВАДРАТ 100 × 100 ММ'?'Контроль 100 × 100 мм':'');
     if(label)drawn.push(`<text x="${c[1]}" y="${c[2]}" font-family="Arial,sans-serif" font-size="${key==='C:'?14:18}" fill="#142d50">${label}</text>`);
    }
   }

@@ -31,7 +31,7 @@
     try{
       const values={waist:number('waist'),hip:number('hip'),hipHeight:number('hipheight'),length:number('length'),hipEaseHalf:Number(document.getElementById('hip-ease').value),material:document.getElementById('material').value};
       const c=calculateSkirtReference(values),canvas=document.createElement('canvas');canvas.width=1200;canvas.height=1733;
-      const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,1200,1733);ctx.fillStyle='#1d2434';ctx.font='bold 38px Arial';ctx.fillText('Bumbari · схема прямой юбки',40,60);
+      const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,1200,1733);ctx.fillStyle='#1d2434';ctx.font='bold 38px Arial';ctx.fillText('Бумбари · схема прямой юбки',40,60);
       ctx.fillStyle='#a31b3b';ctx.font='bold 22px Arial';ctx.fillText('УЧЕБНАЯ СХЕМА · НЕ 1:1 · НЕ ДЛЯ РАСКРОЯ',40,105);
       const svg=buildSkirtDrawing(values,{annotations:true}).svg;
       const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));

@@ -65,8 +65,8 @@
  function foundationArtwork(d){
   const cmd=[],p=d.points,x=n=>20+n*10,y=n=>25+n*10;
   const line=(a,b)=>cmd.push(['L',x(a.x),y(a.y),x(b.x),y(b.y)]);
-  cmd.push(['T',15,10,'BUMBARI / TROUSER FRONT HALF / 1:1 / NO SEAM ALLOWANCES']);
-  cmd.push(['T',15,17,'FRONT CONTOUR / BACK GRID GUIDES ONLY / NOT A COMPLETE PAIR']);
+  cmd.push(['T',15,10,'БУМБАРИ / ПЕРЕДНЯЯ ПОЛОВИНКА БРЮК / 1:1 / БЕЗ ПРИПУСКОВ']);
+  cmd.push(['T',15,17,'КОНТУР ПЕРЕДА / НАПРАВЛЯЮЩИЕ СПИНКИ / НЕПОЛНЫЙ КОМПЛЕКТ']);
   for(const level of [0,d.hipY,d.values.seatHeight,d.kneeY,d.hemY])line({x:0,y:level},{x:d.frontWidth+d.stepWidth+3,y:level});
   for(const xx of [0,d.frontWidth,d.crease])line({x:xx,y:0},{x:xx,y:d.hemY});
   for(const [a,b] of [[7,'15a'],[9,'16a'],[15,'15a'],[16,'16a']])line(p[a],p[b]);
@@ -81,7 +81,7 @@
   for(const [name,point] of Object.entries(p))cmd.push(['T',x(point.x)+1,y(point.y)-1,name]);
   const sx=x(d.frontWidth+d.stepWidth+5),sy=40;
   for(const [a,b,c,e] of [[sx,sy,sx+100,sy],[sx+100,sy,sx+100,sy+100],[sx+100,sy+100,sx,sy+100],[sx,sy+100,sx,sy]])cmd.push(['L',a,b,c,e]);
-  cmd.push(['T',sx,sy-5,'CONTROL 100 x 100 mm']);
+  cmd.push(['T',sx,sy-5,'КОНТРОЛЬНЫЙ КВАДРАТ 100 × 100 ММ']);
   return {cmd,width:sx+115,height:y(d.hemY)+20};
  }
  root.TrouserFoundation={build:buildTrouserFoundation,artwork:foundationArtwork};
