@@ -19,7 +19,7 @@
   ];
   const home=document.getElementById('category-home'),catalog=document.getElementById('model-catalog'),cards=catalog.querySelector('.cards'),next=document.getElementById('next1');
   home.innerHTML=categories.map(([id,title,description])=>`<button class="category-card" data-family="${id}">${svg(shapes[id])}<strong>${title}</strong><small>${description}</small></button>`).join('');
-  cards.innerHTML=models.map(([id,group,title,shape])=>`<button class="card${id===item?' selected':''}" data-item="${id}" data-family="${group}"><span class="icon">${id==='skirt90'?'<img src="assets/skirt-90-ivory.png" alt="" loading="lazy">':svg(shapes[shape])}</span><strong>${title}</strong><small>${id==='skirt'?'Учебная демонстрация':id==='skirt90'?'Фото-образец · построение не готово':id==='pants'?'Передняя половинка · неполный комплект':'Планируется · построения пока нет'}</small></button>`).join('');
+  cards.innerHTML=models.map(([id,group,title,shape])=>`<button class="card${id===item?' selected':''}" data-item="${id}" data-family="${group}"><span class="icon">${['skirt','skirt90'].includes(id)?'<img src="assets/'+(id==='skirt'?'straight-skirt-ivory.png':'skirt-90-ivory.png')+'" alt="" loading="lazy">':svg(shapes[shape])}</span><strong>${title}</strong><small>${id==='skirt'?'Фото-образец · учебная основа':id==='skirt90'?'Фото-образец · построение не готово':id==='pants'?'Передняя половинка · неполный комплект':'Планируется · построения пока нет'}</small></button>`).join('');
   home.querySelectorAll('button').forEach(button=>button.onclick=()=>{
     home.hidden=true;catalog.hidden=false;
     document.getElementById('category-title').textContent=categories.find(c=>c[0]===button.dataset.family)[1]+' · выберите модель';
