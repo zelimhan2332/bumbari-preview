@@ -62,6 +62,7 @@ function pdf(art,tiles){
   const id=4+i*2,W=t.width,H=t.height,X=x=>n(x-t.x+10),Y=y=>n(H-10-y+t.y);
   let s=`0.6 w\nBT /F1 8 Tf 28 ${n(H-5)} Td (${esc(t.label)}) Tj ET\nq\n${n(10)} ${n(10)} ${n(W-20)} ${n(H-20)} re W n\n`;
   for(const c of art.cmd){
+   if(c[0]==='W')s+=`${n(c[1])} w\n`;
    if(c[0]==='L')s+=`${X(c[1])} ${Y(c[2])} m ${X(c[3])} ${Y(c[4])} l S\n`;
    if(c[0]==='C')s+=`${X(c[1])} ${Y(c[2])} m ${X(c[3])} ${Y(c[4])} ${X(c[5])} ${Y(c[6])} ${X(c[7])} ${Y(c[8])} c S\n`;
    if(c[0]==='T')s+=`BT /F1 9 Tf ${X(c[1])} ${Y(c[2])} Td (${esc(c[3])}) Tj ET\n`;
