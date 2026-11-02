@@ -9,6 +9,10 @@ assert.equal(d.points[15].x,5.5);assert.equal(d.points[16].x,24.5);
 for(const [name,p] of Object.entries(d.points))assert(Number.isFinite(p.x)&&Number.isFinite(p.y),name);
 assert(d.points[17].x>d.frontWidth);assert.equal(d.points[13].y,58.3);
 assert.equal(d.front.dart.intake,2);assert.equal(d.front.dart.length,9.5);
+assert.equal(d.points[20].x,d.points[8].x+.5);
+assert.equal(d.points[20].y,0);
+assert.equal(d.points[21].x,d.points[20].x-v.waist/4-d.front.dart.intake-.25);
+assert.equal(d.points[22].y-d.points[21].y,1.25);
 assert.deepEqual(d.front.outline[0],d.front.outline.at(-1),'front contour closes');
 assert(d.front.outline.length>40,'front contour uses interpolated construction points');
 for(const hip of [90,100,120]){

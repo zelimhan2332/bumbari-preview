@@ -28,7 +28,8 @@
   points[18]=onY(points[7],points['15a'],kneeY);
   points[19]=onY(points[9],points['16a'],kneeY);
   // Source steps 1–3: waist, fly, knee and dart construction for the front half.
-  points[20]={...points[10]};
+  // PDF20: point 20 lies on the vertical through point 8 shifted 0.5 cm right.
+  points[20]={x:points[8].x+.5,y:0};
   points[21]={x:points[20].x-waist/4-frontDart-frontWaistEase,y:points[20].y};
   points[22]={x:points[21].x,y:points[21].y+1.25};
   points[23]={...points[18]};points[24]={...points[19]};
