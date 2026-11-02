@@ -31,6 +31,7 @@ for(const hip of [90,100,120]){
  assert(Math.abs(g.frontWidth+g.backWidth-hip/2)<1e-9);
  assert(Math.abs(g.points[11].x*2-(g.frontWidth+g.stepWidth))<1e-9);
  const pdf=Buffer.from(P.pdf(art,tiles)).toString();assert(pdf.includes('BACK GRID GUIDES ONLY'));
+ assert(pdf.includes('0.5800 0.6800 0.8200 RG'),'PDF distinguishes construction guides from the cut contour');
  assert(pdf.includes('3.9685 w'),'PDF preserves 1.4 mm cut contour width');
  assert(pdf.includes('CONTROL 100 x 100 mm'));
  assert(tiles.at(-1).x+190>=art.width&&tiles.at(-1).y+277>=art.height);
