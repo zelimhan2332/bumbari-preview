@@ -10,8 +10,19 @@ android {
         applicationId = "ru.bumbari.patterns"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = providers.gradleProperty("androidVersionCode").orNull?.toInt() ?: 2
+        versionName = providers.gradleProperty("androidVersionName").orNull ?: "0.2.0"
+    }
+    signingConfigs {
+        create("release") {
+            val keyPath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
+            if (keyPath != null) {
+                storeFile = file(keyPath)
+                storePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").orNull
+                keyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").orNull
+                keyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").orNull
+            }
+        }
     }
     buildFeatures { compose = true }
     compileOptions {
@@ -19,6 +30,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    buildTypes { getByName("release") { signingConfig = signingConfigs.getByName("release") } }
 }
 dependencies {
     implementation("androidx.activity:activity-compose:1.10.1")

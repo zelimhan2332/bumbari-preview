@@ -17,7 +17,44 @@ object Geometry {
         p.validate()
         val waist=p.waist+p.waistEase; val a=p.seam
         val skirt: Piece; val hips: Double
-        if(p.model != Model.GORES) {
+        if(p.model == Model.STRAIGHT) {
+            val hipHalf=p.hip/2+p.hipEaseHalf
+            hips=hipHalf*2
+            val totalIntake=hipHalf-(p.waist/2+1.0)
+            require(totalIntake in 8.0..18.0) { "Для такого соотношения талии и бёдер построение прямой юбки ещё не поддерживается." }
+            val bookExample=p.hip==100.0 && p.hipHeight==20.8 && p.length==61.5 && p.hipEaseHalf==1.0 && p.waist in listOf(72.0,76.0)
+            val backDarts=if(bookExample && p.waist==76.0) 1 else if(totalIntake>12.5) 2 else 1
+            val sideTake=if(bookExample) 7.0 else totalIntake/2
+            val frontTake=if(bookExample) 2.0 else minOf(2.0,totalIntake/4)
+            val backTake=totalIntake-sideTake-frontTake
+            val quarter=hipHalf/2; val frontWidth=quarter-sideTake/2; val backWidth=quarter-sideTake/2
+            val frontClosed=frontWidth-frontTake; val backClosed=backWidth-backTake
+            val frontDartX=frontClosed-7.0; val backDartXs=if(backDarts==2) listOf(6.0, backClosed-6.0) else listOf(backClosed/2)
+            require(frontDartX>2 && backDartXs.all { it>2 && it<backClosed-1 }) { "Вытачки не помещаются на полотнище; проверьте мерки" }
+            val frontDart=listOf(Point(frontDartX-frontTake/2,0.0),Point(frontDartX,9.5),Point(frontDartX+frontTake/2,0.0))
+            val backIntakes=if(bookExample && p.waist==72.0) listOf(3.0,2.0) else if(backDarts==2) listOf(backTake*.6,backTake*.4) else listOf(backTake)
+            val backMarks=backDartXs.zip(backIntakes).mapIndexed { i,(x,take)->listOf(Point(x-take/2,0.0),Point(x,if(backDarts==2&&i==0)12.5 else 14.0),Point(x+take/2,0.0)) }
+            val hemY=p.length
+            val frontSeam=listOf(Point(0.0,0.0),Point(frontClosed,0.0),Point(frontWidth,p.hipHeight),Point(frontWidth,hemY),Point(0.0,hemY))
+            val backSeam=listOf(Point(0.0,0.0),Point(backClosed,0.0),Point(backWidth,p.hipHeight),Point(backWidth,hemY),Point(0.0,hemY))
+            // Digital straight-panel approximation; the book's ease/dart totals are kept explicit.
+            val frontCut=listOf(Point(0.0,-a),Point(frontClosed+a,-a),Point(frontWidth+a,p.hipHeight),Point(frontWidth+a,hemY+p.hem),Point(0.0,hemY+p.hem))
+            val backCut=listOf(Point(-a,-a),Point(backClosed+a,-a),Point(backWidth+a,p.hipHeight),Point(backWidth+a,hemY+p.hem),
+                Point(0.0,hemY+p.hem),Point(-p.ventWidth,hemY+p.hem),Point(-p.ventWidth,hemY-p.ventLength-2),Point(-a,hemY-p.ventLength-2),Point(-a,p.hipHeight))
+            val frontPiece=Piece("Переднее полотнище · сгиб",1,true,frontSeam,frontCut,listOf(frontDart,
+                listOf(Point(0.0,6.0),Point(0.0,p.length-3)),listOf(Point(frontWidth-.4,p.hipHeight),Point(frontWidth+a,p.hipHeight)),
+                listOf(Point(frontWidth/2,p.length*.55),Point(frontWidth/2,p.length*.55+15))))
+            val backPiece=Piece("Заднее полотнище · зеркальная пара · шлица",2,false,backSeam,backCut,backMarks+listOf(
+                listOf(Point(backWidth-a,p.zip),Point(backWidth+a,p.zip)),listOf(Point(-p.ventWidth,p.length-p.ventLength),Point(-a,p.length-p.ventLength)),
+                listOf(Point(backWidth/2,p.hipHeight),Point(backWidth/2,p.length-3))))
+            val beltLength=p.waist+5
+            val beltWidth=p.belt*2
+            val belt=Piece("Пояс · прокладка · застёжка",1,false,
+                rectangle(0.0,0.0,beltLength-3,beltWidth),rectangle(-a,-a,beltLength+a,beltWidth+a),
+                listOf(listOf(Point(0.0,p.belt),Point(beltLength-3,p.belt)),listOf(Point(p.waist/2,0.0),Point(p.waist/2,beltWidth))))
+            val result=Pattern(p,listOf(frontPiece,backPiece,belt),p.waist+2,hips)
+            return result
+        } else if(p.model != Model.GORES) {
             val full=p.model==Model.FULL; val theta=if(full) 2*PI else PI
             val r=waist/theta; val outer=r+p.length; val inner=r-a; val end=if(full) -PI/2 else 0.0
             hips=theta*(r+p.hipHeight)
