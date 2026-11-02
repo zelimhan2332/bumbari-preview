@@ -53,11 +53,11 @@
   const line=(p,q,origin=o)=>cmd.push(['L',origin.x+p.x*10,origin.y+p.y*10,origin.x+q.x*10,origin.y+q.y*10]);
   const text=(x,y,t)=>cmd.push(['T',x,y,t]);
   const chain=(ps,origin=o,closed=true)=>{for(let i=1;i<ps.length;i++)line(ps[i-1],ps[i],origin);if(closed)line(ps.at(-1),ps[0],origin);};
-  text(8,10,circle?'BUMBARI / FULL-CIRCLE SKIRT / 1:1 / UNLINED':'BUMBARI / HALF-CIRCLE SKIRT / 1:1 / UNLINED');
-  text(8,17,`W ${k.values.waist}; H ${k.values.hip}; HH ${k.values.hipHeight}; L ${k.values.length} cm`);
-  text(8,24,`WAIST EASE ${k.settings.waistEase}; SEAMS ${a}; HEM ${k.settings.hemAllowance} cm INCLUDED`);
-  text(8,31,'GEOMETRIC MODEL / PRINT 100% / FIT A TOILE BEFORE FINAL FABRIC');
-  text(8,43,circle?'A: FRONT + BACK / CUT 2 SEMICIRCLES 180 DEG / NO FOLD':'A: SKIRT / HALF TEMPLATE 90 DEG / FULL PIECE 180 DEG');
+  text(8,10,circle?'БУМБАРИ · ЮБКА-СОЛНЦЕ / МАСШТАБ 1:1 / БЕЗ ПОДКЛАДКИ':'БУМБАРИ · ПОЛУСОЛНЦЕ / МАСШТАБ 1:1 / БЕЗ ПОДКЛАДКИ');
+  text(8,17,`ОТ ${k.values.waist}; ОБ ${k.values.hip}; ВБ ${k.values.hipHeight}; ДЮ ${k.values.length} СМ`);
+  text(8,24,`ПРИБАВКА К ТАЛИИ ${k.settings.waistEase}; ШВЫ ${a}; ПОДГИБКА ${k.settings.hemAllowance} СМ`);
+  text(8,31,'РАСЧЁТНАЯ МОДЕЛЬ / ПЕЧАТЬ 100% / СНАЧАЛА СШИТЬ МАКЕТ');
+  text(8,43,circle?'А: ПЕРЕД И СПИНКА / ВЫКРОИТЬ 2 РАЗА / БЕЗ СГИБА':'А: ЮБКА / ПОЛОВИНА 90° / ЦЕЛАЯ ДЕТАЛЬ 180°');
   for(const [p,origin] of [[k.pieces[0],o],[k.pieces[1],bo]]){
    cmd.push(['K',0,0,0],['W',.4],['D']);chain(p.cut,origin);
    cmd.push(['K',.25,.4,.6],['W',.2],['D',2,1]);chain(p.seam,origin);cmd.push(['D']);
@@ -68,27 +68,27 @@
   radial(circle?0:Math.PI/4,k.radius-a,k.radius+.4);
   if(circle){
    line({x:-a,y:-k.radius-k.settings.zipperLength},{x:.5,y:-k.radius-k.settings.zipperLength});
-   text(o.x+5,o.y-(k.radius+k.settings.zipperLength)*10,'ZIP END');
+   text(o.x+5,o.y-(k.radius+k.settings.zipperLength)*10,'КОНЕЦ МОЛНИИ');
   }else{
    line({x:k.radius+k.settings.zipperLength,y:-a},{x:k.radius+k.settings.zipperLength,y:.5});
-   text(o.x+(k.radius+k.settings.zipperLength)*10,o.y+8,'ZIP END');
+   text(o.x+(k.radius+k.settings.zipperLength)*10,o.y+8,'КОНЕЦ МОЛНИИ');
   }
-  text(o.x+5,o.y+(k.radius+k.values.length*.6)*10,circle?'SIDE SEAM / ALLOWANCE INCLUDED':'CENTER FRONT / FOLD / NO ALLOWANCE');
+  text(o.x+5,o.y+(k.radius+k.values.length*.6)*10,circle?'БОКОВОЙ ШОВ / ПРИПУСК ВКЛЮЧЁН':'СЕРЕДИНА ПЕРЕДА / СГИБ / БЕЗ ПРИПУСКА');
   const gx=k.radius*.35,gy=k.radius+5,ge=Math.min(gy+15,k.hemRadius-3);
   if(circle){
-   line({x:gy,y:0},{x:ge,y:0});line({x:gy,y:0},{x:gy+1,y:-.4});line({x:gy,y:0},{x:gy+1,y:.4});text(o.x+gy*10,o.y+8,'GRAIN / CENTER FRONT OR BACK');
+   line({x:gy,y:0},{x:ge,y:0});line({x:gy,y:0},{x:gy+1,y:-.4});line({x:gy,y:0},{x:gy+1,y:.4});text(o.x+gy*10,o.y+8,'ДОЛЕВАЯ / СЕРЕДИНА ПЕРЕДА ИЛИ СПИНКИ');
   }else{
-   line({x:gx,y:gy},{x:gx,y:ge});line({x:gx,y:gy},{x:gx-.4,y:gy+1});line({x:gx,y:gy},{x:gx+.4,y:gy+1});text(o.x+gx*10+5,o.y+(gy+ge)*5,'GRAIN');
+   line({x:gx,y:gy},{x:gx,y:ge});line({x:gx,y:gy},{x:gx-.4,y:gy+1});line({x:gx,y:gy},{x:gx+.4,y:gy+1});text(o.x+gx*10+5,o.y+(gy+ge)*5,'ДОЛЕВАЯ');
   }
-  text(circle?o.x+5:o.x+(k.radius+3)*10,circle?o.y-(k.radius+3)*10:o.y+17,circle?'SIDE SEAM / ZIP FROM WAIST':'CENTER BACK / SEAM / ZIP FROM WAIST');
+  text(circle?o.x+5:o.x+(k.radius+3)*10,circle?o.y-(k.radius+3)*10:o.y+17,circle?'БОКОВОЙ ШОВ / МОЛНИЯ ОТ ТАЛИИ':'СРЕДНИЙ ШОВ СПИНКИ / МОЛНИЯ ОТ ТАЛИИ');
   const by=bo.y-a*10;
-  text(8,by-7,'B: WAISTBAND / CUT 1 + FUSIBLE / GRAIN ALONG LENGTH');
+  text(8,by-7,'Б: ПОЯС / ВЫКРОИТЬ 1 + ПРОКЛАДКА / ДОЛЕВАЯ ВДОЛЬ');
   cmd.push(['D',3,1]);line({x:0,y:k.belt.finishedWidth},{x:k.belt.length,y:k.belt.finishedWidth},bo);cmd.push(['D']);
   line({x:k.audit.waistSeam,y:0},{x:k.audit.waistSeam,y:k.belt.cutWidth},bo);
   for(const x of [k.audit.waistSeam/4,k.audit.waistSeam/2,k.audit.waistSeam*3/4]){
    line({x,y:-a},{x,y:.4},bo);line({x,y:k.belt.cutWidth-.4},{x,y:k.belt.cutWidth+a},bo);
   }
-  text(bo.x+8,bo.y+k.belt.finishedWidth*10-4,`FOLD / WIDTH ${k.belt.finishedWidth} / OVERLAP 3 cm`);
+  text(bo.x+8,bo.y+k.belt.finishedWidth*10-4,`СГИБ / ШИРИНА ${k.belt.finishedWidth} / ЗАХОД 3 СМ`);
   const bottom=bo.y+(k.belt.cutWidth+a)*10;
   let squareY=bottom+45;
   // Keep the calibration square and caption intact on both A4 and A0 tiles.
@@ -97,28 +97,20 @@
    if(squareY%1159>1050)squareY=Math.ceil(squareY/1159)*1159+8;
   }
   const square=[{x:0,y:0},{x:10,y:0},{x:10,y:10},{x:0,y:10}];cmd.push(['K',0,0,0],['W',.3]);chain(square,{x:8,y:squareY});
-  text(8,squareY-6,'CONTROL 100 x 100 mm');
-  text(135,squareY+10,'BLACK: CUT / BLUE DASH: STITCH OR FOLD');
-  text(135,squareY+18,circle?'CUT A TWICE / FLAT / NO FOLD / SIDE ZIP':'MIRROR A AT CENTER FRONT FOR FLAT CUTTING');
-  text(135,squareY+26,circle?'FRONT + BACK / TWO SIDE SEAMS / NO LINING':'ONE FULL SKIRT PIECE / BACK SEAM / NO LINING');
-  text(8,bottom+12,`BELT SEAM ${k.audit.waistSeam.toFixed(2)} cm / ZIP ${k.settings.zipperLength} cm`);
-  text(8,bottom+20,'HANG SKIRT BEFORE LEVELLING AND HEMMING / TOILE FIRST');
+  text(8,squareY-6,'КОНТРОЛЬНЫЙ КВАДРАТ 100 × 100 ММ');
+  text(135,squareY+10,'ЧЁРНАЯ ЛИНИЯ: СРЕЗ / СИНЯЯ ШТРИХОВАЯ: ШОВ ИЛИ СГИБ');
+  text(135,squareY+18,circle?'ДЕТАЛЬ А ВЫКРОИТЬ ДВАЖДЫ / В РАСКРЫТ / БЕЗ СГИБА':'ЗЕРКАЛЬНО ОТРАЗИТЬ ПО СЕРЕДИНЕ ПЕРЕДА');
+  text(135,squareY+26,circle?'ПЕРЕД И СПИНКА / ДВА БОКОВЫХ ШВА / БЕЗ ПОДКЛАДКИ':'ЦЕЛАЯ ДЕТАЛЬ ЮБКИ / ШОВ СПИНКИ / БЕЗ ПОДКЛАДКИ');
+  text(8,bottom+12,`ШОВ ПОЯСА ${k.audit.waistSeam.toFixed(2)} СМ / МОЛНИЯ ${k.settings.zipperLength} СМ`);
+  text(8,bottom+20,'ПЕРЕД ПОДГИБКОЙ ДАТЬ ЮБКЕ ОТВИСЕТЬСЯ / СНАЧАЛА МАКЕТ');
   return {cmd,width:Math.max((outer+(circle?a:0))*10+16,(k.belt.length+2*a)*10+16,560),height:squareY+115,
    panels:{A:[0,35,(outer+(circle?a:0))*10+20,(circle?2*outer:outer+a)*10+45],B:[0,by-18,(k.belt.length+2*a)*10+20,(k.belt.cutWidth+2*a)*10+35]},square:{x:8,y:squareY,size:100},fullAngle:k.fullAngle};
  }
  function svg(art,piece){
   let ink='#142d50',width=.4,dash='';const out=[];
-  const labels={'A: SKIRT / HALF TEMPLATE 90 DEG / FULL PIECE 180 DEG':'Юбка · половина 90° · целая деталь 180°',
-   'A: FRONT + BACK / CUT 2 SEMICIRCLES 180 DEG / NO FOLD':'Перед и спинка · выкроить 2 раза · без сгиба',
-   'SIDE SEAM / ALLOWANCE INCLUDED':'Боковой шов · припуск включён',
-   'SIDE SEAM / ZIP FROM WAIST':'Боковой шов · молния',
-   'GRAIN / CENTER FRONT OR BACK':'Долевая · середина переда или спинки',
-   'B: WAISTBAND / CUT 1 + FUSIBLE / GRAIN ALONG LENGTH':'Пояс · 1 деталь + прокладка · долевая вдоль',
-   'CENTER FRONT / FOLD / NO ALLOWANCE':'Середина переда · сгиб без припуска','GRAIN':'Долевая',
-   'CENTER BACK / SEAM / ZIP FROM WAIST':'Средний шов спинки · молния','ZIP END':'Конец молнии','CONTROL 100 x 100 mm':'Контроль 100 × 100 мм'};
   for(const c of art.cmd){if(c[0]==='K')ink=c[1]===0?'#142d50':'#627a9a';if(c[0]==='W')width=c[1];if(c[0]==='D')dash=c.slice(1).join(' ');
    if(c[0]==='L')out.push(`<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" fill="none" stroke="${ink}" stroke-width="${Math.max(.7,width*2)}" vector-effect="non-scaling-stroke" stroke-dasharray="${dash}"/>`);
-   if(c[0]==='T'&&labels[c[3]])out.push(`<text x="${c[1]}" y="${c[2]}" font-family="Arial,sans-serif" font-size="12" fill="#142d50">${labels[c[3]]}</text>`);
+   if(c[0]==='T')out.push(`<text x="${c[1]}" y="${c[2]}" font-family="Arial,sans-serif" font-size="12" fill="#142d50">${c[3]}</text>`);
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${piece?art.panels[piece].join(' '):`0 0 ${art.width} ${art.height}`}" role="img" aria-label="${art.fullAngle===360?'Солнце':'Полусолнце'}: юбка, пояс, припуски и метки">${out.join('')}</svg>`;
  }

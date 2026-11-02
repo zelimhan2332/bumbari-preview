@@ -1,5 +1,5 @@
 (function(root){
-const node=typeof module!=='undefined',E=node?require('./skirt-geometry'):root.MuellerSkirtGeometry,calc=node?require('./skirt-calculation').calculateSkirtReference:calculateSkirtReference,waistband=node?require('./waistband').buildWaistband:root.buildWaistband;
+const node=typeof module!=='undefined',E=node?require('./skirt-geometry'):root.MuellerSkirtGeometry,calc=node?require('./skirt-calculation').calculateSkirtReference:calculateSkirtReference,waistband=node?require('./waistband').buildWaistband:root.buildWaistband,strokeFont=node?require('./pattern-stroke-font'):root.PatternStrokeFont;
 function build(v){
  const c=calc(v),reference=c.exactBookCase;
  if(!c.darts){
@@ -33,41 +33,46 @@ function artwork(data){
  const v=data.values,g=data.geometry,cmd=[],h=g.half*10,H=v.hipHeight*10,L=v.length*10,bx=h+55;
  const line=(...p)=>cmd.push(['L',...p]),text=(...p)=>cmd.push(['T',...p]);
  const curve=(s,x,y)=>cmd.push(['C',...[s.a,s.c1,s.c2,s.b].flatMap(p=>[x+p.x*10,y+p.y*10])]);
-  text(15,10,'BUMBARI / TOILE / 1:1 / NO SEAM ALLOWANCES');text(15,17,`Waist ${v.waist}; hip ${v.hip}; hip height ${v.hipHeight}; length ${v.length} cm`);
-  text(15,24,data.reference?'BOOK NUMERIC CASE / CONTOURS REQUIRE VERIFICATION':'EXPERIMENTAL DART DISTRIBUTION / NOT BOOK-VERIFIED');
-  text(15,31,'SOURCE: ATELIER 2001, PDF 5-7 / NUMERICAL TRUING / TEST TOILE REQUIRED');
+  text(15,10,'БУМБАРИ / ПРОБНИК / МАСШТАБ 1:1 / БЕЗ ПРИПУСКОВ');text(15,17,`ОТ ${v.waist}; ОБ ${v.hip}; ВБ ${v.hipHeight}; ДЮ ${v.length} СМ`);
+  text(15,24,data.reference?'КОНТРОЛЬНЫЙ ПРИМЕР ПО КНИГЕ / КОНТУРЫ ПРОВЕРИТЬ':'РАСЧЁТНОЕ РАСПРЕДЕЛЕНИЕ ВЫТАЧЕК / НЕ ПО КНИГЕ');
+  text(15,31,'ИСТОЧНИК: АТЕЛЬЕ 2001, ФАЙЛЫ 5–7 / УРАВНИВАНИЕ КОНТУРОВ / СНАЧАЛА МАКЕТ');
  for(const [p,x,front] of [[g.front,15,true],[g.back,bx,false]]){
   const y=40;for(const s of p.waist)curve(s,x,y);curve(p.side,x,y);
   for(const d of p.darts){for(const end of [d.left,d.right])line(x+end.x*10,y+end.y*10,x+d.tip.x*10,y+d.tip.y*10);line(x+d.left.x*10,y+d.left.y*10,x+d.right.x*10,y+d.right.y*10);}
   line(x,y+L,x+h,y+L);line(x+(front?0:h),y,x+(front?0:h),y+L);line(x+(front?h:0),y+H,x+(front?h:0),y+L);line(x,y+H,x+h,y+H);
-  text(x+20,y+L*.55,front?'FRONT: 1 ON FOLD':'BACK: 2 MIRRORED');text(x+20,y+L*.55+8,'SEAM LINE - ADD ALLOWANCES');
-  line(x+h*.6,y+L*.65,x+h*.6,y+L*.9);line(x+h*.6,y+L*.65,x+h*.6-3,y+L*.65+7);line(x+h*.6,y+L*.65,x+h*.6+3,y+L*.65+7);text(x+h*.6+4,y+L*.77,'GRAIN');
+  text(x+20,y+L*.55,front?'ПЕРЕД: 1 ДЕТАЛЬ ПО СГИБУ':'СПИНКА: 2 ДЕТАЛИ ЗЕРКАЛЬНО');text(x+20,y+L*.55+8,'ЛИНИЯ ШВА — ДОБАВИТЬ ПРИПУСКИ');
+  line(x+h*.6,y+L*.65,x+h*.6,y+L*.9);line(x+h*.6,y+L*.65,x+h*.6-3,y+L*.65+7);line(x+h*.6,y+L*.65,x+h*.6+3,y+L*.65+7);text(x+h*.6+4,y+L*.77,'ДОЛЕВАЯ');
  }
   const belt=waistband({waistSeam:g.audit.waist*2}),band=belt.length*10,by=L+65;
   line(15,by,15+band,by);line(15,by+belt.cutWidth*10,15+band,by+belt.cutWidth*10);line(15,by,15,by+belt.cutWidth*10);line(15+band,by,15+band,by+belt.cutWidth*10);line(15,by+belt.finishedWidth*10,15+band,by+belt.finishedWidth*10);line(15+band-belt.overlap*10,by,15+band-belt.overlap*10,by+belt.cutWidth*10);
-  text(20,by+13,`WAISTBAND ${belt.length.toFixed(2)} x ${belt.cutWidth} cm / overlap ${belt.overlap} cm / ADD ALLOWANCES`);
-  text(20,by+23,'ATELIER 2001 PDF 9 FIG 9 / LENGTH MATCHED TO GENERATED WAIST SEAM');
- const sx=bx+h+20;line(sx,40,sx+100,40);line(sx,140,sx+100,140);line(sx,40,sx,140);line(sx+100,40,sx+100,140);text(sx,32,'CONTROL 100 x 100 mm');
+  text(20,by+13,`ПОЯС ${belt.length.toFixed(2)} × ${belt.cutWidth} СМ / ЗАХОД ${belt.overlap} СМ / ДОБАВИТЬ ПРИПУСКИ`);
+  text(20,by+23,'АТЕЛЬЕ 2001, ФАЙЛ 9, РИС. 9 / ДЛИНА ПО ЛИНИИ ТАЛИИ');
+ const sx=bx+h+20;line(sx,40,sx+100,40);line(sx,140,sx+100,140);line(sx,40,sx,140);line(sx+100,40,sx+100,140);text(sx,32,'КОНТРОЛЬНЫЙ КВАДРАТ 100 × 100 ММ');
  return {cmd,width:Math.max(sx+110,band+30),height:by+75};
 }
 function pages(art,format){
- if(format==='plotter'){const cols=Math.ceil((art.width-10)/811),rows=Math.ceil((art.height-10)/1159),tiles=[];for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)tiles.push({width:841,height:1189,x:c*811,y:r*1159,label:`A0 R${r+1}C${c+1} / ${rows} rows x ${cols} columns / 100% / overlap 10 mm`});return tiles;}
+ if(format==='plotter'){const cols=Math.ceil((art.width-10)/811),rows=Math.ceil((art.height-10)/1159),tiles=[];for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)tiles.push({width:841,height:1189,x:c*811,y:r*1159,label:`ЛИСТ ${r+1}-${c+1} ИЗ ${rows*cols} · А0 · 100% · НАХЛЁСТ 10 ММ`});return tiles;}
  const cols=Math.ceil((art.width-10)/180),rows=Math.ceil((art.height-10)/267),out=[];
- for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)out.push({width:210,height:297,x:c*180,y:r*267,label:`R${r+1}C${c+1} / ${rows} rows x ${cols} columns / overlap 10 mm / 100%`});return out;
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)out.push({width:210,height:297,x:c*180,y:r*267,label:`ЛИСТ ${r+1}-${c+1} ИЗ ${rows*cols} · А4 · 100% · НАХЛЁСТ 10 ММ`});return out;
 }
 function pdf(art,tiles){
  const enc=new TextEncoder(),o=[],n=x=>(x*72/25.4).toFixed(4),esc=s=>s.replace(/[\\()]/g,'\\$&');
  o[1]='<< /Type /Catalog /Pages 2 0 R >>';o[2]=`<< /Type /Pages /Kids [${tiles.map((_,i)=>`${4+i*2} 0 R`).join(' ')}] /Count ${tiles.length} >>`;o[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
  tiles.forEach((t,i)=>{
   const id=4+i*2,W=t.width,H=t.height,X=x=>n(x-t.x+10),Y=y=>n(H-10-y+t.y);
-  let s=`0.6 w\nBT /F1 8 Tf 28 ${n(H-5)} Td (${esc(t.label)}) Tj ET\nq\n${n(10)} ${n(10)} ${n(W-20)} ${n(H-20)} re W n\n`;
+  let s=`0.6 w\nq\n${n(10)} ${n(10)} ${n(W-20)} ${n(H-20)} re W n\n`;
+  for(const g of strokeFont.commands(10,4,t.label,2.8))s+=`0.08 0.12 0.2 rg ${n(g[1])} ${n(H-10-g[2]-g[4])} ${n(g[3])} ${n(g[4])} re f\n`;
   for(const c of art.cmd){
    if(c[0]==='D')s+='['+c.slice(1).map(n).join(' ')+'] 0 d\n';
    if(c[0]==='W')s+=`${n(c[1])} w\n`;
-   if(c[0]==='K')s+=`${c.slice(1).map(x=>Number(x).toFixed(4)).join(' ')} RG\n`;
+   if(c[0]==='K'){const rgb=c.slice(1).map(x=>Number(x).toFixed(4)).join(' ');s+=`${rgb} RG ${rgb} rg\n`;}
    if(c[0]==='L')s+=`${X(c[1])} ${Y(c[2])} m ${X(c[3])} ${Y(c[4])} l S\n`;
    if(c[0]==='C')s+=`${X(c[1])} ${Y(c[2])} m ${X(c[3])} ${Y(c[4])} ${X(c[5])} ${Y(c[6])} ${X(c[7])} ${Y(c[8])} c S\n`;
-   if(c[0]==='T')s+=`BT /F1 9 Tf ${X(c[1])} ${Y(c[2])} Td (${esc(c[3])}) Tj ET\n`;
+   if(c[0]==='T'){
+    if(/[А-Яа-яЁё]/.test(c[3]))for(const g of strokeFont.commands(c[1],c[2]-3.2,c[3],3.2))s+=`${X(g[1])} ${Y(g[2])-n(g[4])} ${n(g[3])} ${n(g[4])} re f\n`;
+    else s+=`BT /F1 9 Tf ${X(c[1])} ${Y(c[2])} Td (${esc(c[3])}) Tj ET\n`;
+   }
+   if(c[0]==='G')s+=`${X(c[1])} ${Y(c[2])-n(c[4])} ${n(c[3])} ${n(c[4])} re f\n`;
   }
   s+=`Q\n${n(10)} ${n(10)} ${n(W-20)} ${n(H-20)} re S\n`;
   o[id]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n(W)} ${n(H)}] /Resources << /Font << /F1 3 0 R >> >> /Contents ${id+1} 0 R >>`;o[id+1]=`<< /Length ${enc.encode(s).length} >>\nstream\n${s}endstream`;
