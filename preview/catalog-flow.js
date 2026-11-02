@@ -13,24 +13,24 @@
   const categories=[['upper','Плечевые изделия','Лифы, платья, блузы'],['lower','Поясные изделия','Юбки и брюки'],['sleeves','Рукава','Базовые и модельные'],['details','Воротники и детали','Воротники и капюшон']];
   const models=[
     ['bodice-waist','upper','Лиф до талии','bodice'],['bodice-hip','upper','Лиф до бёдер','bodice'],['dress','upper','Платье','dress'],['kimono','upper','Короткое кимоно','upper'],['bustier','upper','Бюстье','bodice'],['jersey','upper','Трикотажная футболка','upper'],['hoodie','upper','Худи','upper'],
-    ['skirt','lower','Прямая юбка','skirt'],['skirt90','lower','Полусолнце · 90° на сгибе','skirt'],['skirt180','lower','Юбка 180°','skirt'],['skirt4','lower','Юбка из 4 клиньев','skirt'],['skirt6','lower','Юбка из 6 клиньев','skirt'],['skirt8','lower','Юбка из 8 клиньев','skirt'],['pajama','lower','Пижамные брюки','lower'],['sport-pants','lower','Спортивные брюки','lower'],['pants','lower','Классические брюки','lower'],
+    ['skirt','lower','Прямая юбка','skirt'],['skirt90','lower','Полусолнце · 90° на сгибе','skirt'],['skirt180','lower','Солнце · полотнище 180°','skirt'],['skirt4','lower','Юбка из 4 клиньев','skirt'],['skirt6','lower','Юбка из 6 клиньев','skirt'],['skirt8','lower','Юбка из 8 клиньев','skirt'],['pajama','lower','Пижамные брюки','lower'],['sport-pants','lower','Спортивные брюки','lower'],['pants','lower','Классические брюки','lower'],
     ['basic-sleeve','sleeves','Базовый рукав','sleeves'],['sport-sleeve','sleeves','Спортивный рукав','sleeves'],['formal-sleeve','sleeves','Классический рукав','sleeves'],
     ['basic-collar','details','Базовый воротник','details'],['shaped-collar','details','Фигурный воротник','details'],['shirt-collar','details','Рубашечный воротник','details'],['hood','details','Капюшон','hood']
   ];
   const home=document.getElementById('category-home'),catalog=document.getElementById('model-catalog'),cards=catalog.querySelector('.cards'),next=document.getElementById('next1');
   home.innerHTML=categories.map(([id,title,description])=>`<button class="category-card" data-family="${id}">${svg(shapes[id])}<strong>${title}</strong><small>${description}</small></button>`).join('');
-  cards.innerHTML=models.map(([id,group,title,shape])=>`<button class="card${id===item?' selected':''}" data-item="${id}" data-family="${group}"><span class="icon">${['skirt','skirt90'].includes(id)?'<img src="assets/'+(id==='skirt'?'straight-skirt-ivory.png':'skirt-90-ivory.png')+'" alt="" loading="lazy">':svg(shapes[shape])}</span><strong>${title}</strong><small>${id==='skirt'?'Фото-образец · учебная основа':id==='skirt90'?'Юбка и пояс · PDF 1:1':id==='pants'?'Передняя половинка · неполный комплект':'Планируется · построения пока нет'}</small></button>`).join('');
+  cards.innerHTML=models.map(([id,group,title,shape])=>`<button class="card${id===item?' selected':''}" data-item="${id}" data-family="${group}"><span class="icon">${['skirt','skirt90'].includes(id)?'<img src="assets/'+(id==='skirt'?'straight-skirt-ivory.png':'skirt-90-ivory.png')+'" alt="" loading="lazy">':svg(shapes[shape])}</span><strong>${title}</strong><small>${id==='skirt'?'Фото-образец · учебная основа':id==='skirt90'?'Юбка и пояс · PDF 1:1':id==='skirt180'?'Юбка и пояс · PDF 1:1':id==='pants'?'Передняя половинка · неполный комплект':'Планируется · построения пока нет'}</small></button>`).join('');
   home.querySelectorAll('button').forEach(button=>button.onclick=()=>{
     home.hidden=true;catalog.hidden=false;
     document.getElementById('category-title').textContent=categories.find(c=>c[0]===button.dataset.family)[1]+' · выберите модель';
     cards.querySelectorAll('[data-item]').forEach(card=>card.hidden=card.dataset.family!==button.dataset.family);
-    next.hidden=button.dataset.family!=='lower';next.disabled=!['skirt','skirt90','pants'].includes(item);render();
+    next.hidden=button.dataset.family!=='lower';next.disabled=!['skirt','skirt90','skirt180','pants'].includes(item);render();
   });
   document.getElementById('back-categories').onclick=()=>{home.hidden=false;catalog.hidden=true;next.hidden=true;};
   cards.querySelectorAll('[data-item]').forEach(card=>card.onclick=()=>{
     item=card.dataset.item;cards.querySelectorAll('[data-item]').forEach(c=>c.classList.toggle('selected',c===card));
-    next.hidden=false;next.disabled=!['skirt','skirt90','pants'].includes(item);
-    document.getElementById('catalog-note').textContent=item==='skirt'?'Прямая юбка: доступен ввод мерок и учебное построение. Точные лекала для раскроя ещё проверяются.':item==='skirt90'?'Полусолнце: отдельный проект с мерками, юбкой, поясом и PDF 1:1. Сначала проверьте посадку на макете.':item==='pants'?'Классические брюки: передняя половинка и направляющие спинки. Полный комплект для раскроя ещё не готов.':'Эта конструкция запланирована. Расчёт и мерки появятся после проверки методики Мюллера.';
+    next.hidden=false;next.disabled=!['skirt','skirt90','skirt180','pants'].includes(item);
+    document.getElementById('catalog-note').textContent=item==='skirt'?'Прямая юбка: доступен ввод мерок и учебное построение. Точные лекала для раскроя ещё проверяются.':item==='skirt90'?'Полусолнце: отдельный проект с мерками, юбкой, поясом и PDF 1:1. Сначала проверьте посадку на макете.':item==='skirt180'?'Юбка-солнце: полный круг 360°, полотнища по 180°. Отдельный проект с поясом, припусками и PDF.':item==='pants'?'Классические брюки: передняя половинка и направляющие спинки. Полный комплект для раскроя ещё не готов.':'Эта конструкция запланирована. Расчёт и мерки появятся после проверки методики Мюллера.';
     render();
   });
   document.getElementById('build-from-top').onclick=()=>document.getElementById('next2').click();
