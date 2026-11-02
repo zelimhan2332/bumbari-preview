@@ -17,7 +17,7 @@
     if(input.item==='pants'){
       const engine=typeof module!=='undefined'?require('./trouser-foundation'):root.TrouserFoundation;
       engine.build(measurements);
-      if(input.modeling!==undefined||input.vent!==undefined)throw Error('Настройки юбки не относятся к брюкам.');
+      if(input.modeling!==undefined||input.vent!==undefined||input.skirtKit!==undefined)throw Error('Настройки юбки не относятся к брюкам.');
       return result;
     }
     if(input.modeling!==undefined){
@@ -30,6 +30,7 @@
       if(!v||!Number.isFinite(v.width)||v.width<4||v.width>7||!Number.isFinite(v.ventLength)||v.ventLength<=0||v.ventLength>=measurements.length-measurements.hipheight)throw Error('Некорректные параметры шлицы: проверьте длину, ширину и положение относительно бёдер.');
       result.vent={ventLength:v.ventLength,width:v.width};
     }
+    if(input.skirtKit!==undefined){const s=input.skirtKit;if(!s||typeof s.allowances!=='boolean'||!Number.isFinite(s.seamAllowance)||s.seamAllowance<1||s.seamAllowance>2||!Number.isFinite(s.hemAllowance)||s.hemAllowance<2||s.hemAllowance>4||!Number.isFinite(s.zipperLength)||s.zipperLength<18||s.zipperLength>20)throw Error('Некорректные настройки комплекта юбки.');result.skirtKit={allowances:s.allowances,seamAllowance:s.seamAllowance,hemAllowance:s.hemAllowance,zipperLength:s.zipperLength};}
     return result;
   }
   function parseProject(text){
