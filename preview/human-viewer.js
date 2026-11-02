@@ -79,12 +79,12 @@
     const floor=new T.Mesh(new T.CircleGeometry(62,64),new T.MeshStandardMaterial({color:0xe2e8f0,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.6;scene.add(floor);
     const marks=new T.Group();scene.add(marks);
     const garments=new T.Group();scene.add(garments);
-    state={scene,camera,renderer,controls,geometry,marks,garments,values:null,active:null};
+    state={scene,camera,renderer,controls,geometry,body,floor,marks,garments,values:null,active:null};
     controls.addEventListener('change',()=>renderer.render(scene,camera));
     state.draw=()=>renderer.render(scene,camera);
     state.resize=()=>{const c=renderer.domElement.parentElement;if(!c)return;const w=c.clientWidth,h=c.clientHeight;if(w<1||h<1)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();state.draw();};
     state.resizeObserver=new ResizeObserver(state.resize);
-    renderer.domElement.style.cssText='width:100%;height:100%;touch-action:none;display:block;';renderer.domElement.setAttribute('aria-label','Объёмный манекен. Поворачивайте мышью или пальцем.');
+    renderer.domElement.style.cssText='width:100%;height:100%;touch-action:none;display:block;';renderer.domElement.setAttribute('aria-label','Объёмная модель одежды. Поворачивайте мышью или пальцем.');
     return state;
   }
   window.mountHumanMannequin=function(container,values,active,options={}){
@@ -96,7 +96,7 @@
       const s=state||init();const v=Object.fromEntries(Object.entries(defaults).map(([k,d])=>[k,sane(values[k],d)]));
       if(!container.contains(s.renderer.domElement)){container.replaceChildren(s.renderer.domElement);s.resizeObserver.disconnect();s.resizeObserver.observe(container);}
       s.resize();
-      if(s.lastHeight!==v.height){const targetY=v.height/2+3;const fit=Math.max(1,v.height/185);const offset=s.camera.position.clone().sub(s.controls.target).multiplyScalar(fit/(s.lastFit||1));s.controls.target.set(0,targetY,0);s.camera.position.copy(s.controls.target).add(offset);s.controls.update();s.lastHeight=v.height;s.lastFit=fit;}const signature=JSON.stringify(v);
+      if(s.lastHeight!==v.height){const targetY=v.height/2+3;const fit=Math.max(1,v.height/185);const offset=s.camera.position.clone().sub(s.controls.target).multiplyScalar(fit/(s.lastFit||1));s.controls.target.set(0,targetY,0);s.camera.position.copy(s.controls.target).add(offset);s.controls.update();s.lastHeight=v.height;s.lastFit=fit;}const garmentOnly=options.garmentOnly===true;if(s.garmentOnly!==garmentOnly){s.body.visible=!garmentOnly;s.floor.visible=!garmentOnly;if(garmentOnly){s.controls.minDistance=90;s.controls.maxDistance=300;s.controls.target.set(0,76,0);s.camera.position.set(0,78,158);}else{s.controls.minDistance=230;s.controls.maxDistance=480;s.controls.target.set(0,88,0);s.camera.position.set(135,103,340);}s.controls.update();s.garmentOnly=garmentOnly;}const signature=JSON.stringify(v);
       if(s.values!==signature){
         const base=window.MUELLER_HUMAN_DATA.positions,pos=s.geometry.attributes.position.array;
         for(let i=0;i<base.length;i+=3){const p=deform(base[i],base[i+1],base[i+2],v);pos[i]=p[0];pos[i+1]=p[1];pos[i+2]=p[2];}
