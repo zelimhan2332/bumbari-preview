@@ -63,8 +63,10 @@
   for(const level of [0,d.hipY,d.values.seatHeight,d.kneeY,d.hemY])line({x:0,y:level},{x:d.frontWidth+d.stepWidth+3,y:level});
   for(const xx of [0,d.frontWidth,d.crease])line({x:xx,y:0},{x:xx,y:d.hemY});
   for(const [a,b] of [[7,'15a'],[9,'16a'],[15,'15a'],[16,'16a']])line(p[a],p[b]);
+  cmd.push(['K',.58,.68,.82]);
   line(p[11],p[25]);line(p[25],p[26]);line(p[26],p[27]);line(p[7],p[26]);
   line(p[32],p[33]);line(p[31],p[34]);line(p[33],p['33a']);line(p[34],p['34a']);
+  cmd.push(['K',0,0,0]);
   line(p[20],p['8c']);line(p['8b'],p[17]);
   line(d.front.dart.left,d.front.dart.apex);line(d.front.dart.right,d.front.dart.apex);
   cmd.push(['W',1.4]);for(let i=0;i<d.front.outline.length-1;i++)line(d.front.outline[i],d.front.outline[i+1]);cmd.push(['W',.6]);
@@ -85,7 +87,7 @@
   const out=document.getElementById('trouser-result'),preview=document.getElementById('trouser-preview');
   try{const d=buildTrouserFoundation(values()),art=foundationArtwork(d),f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
    out.textContent=`Длина шага: ${f(d.inseam)}; от сидения до колена: ${f(d.kneeFromSeat)}; ширина передней сетки: ${f(d.frontWidth)}; ширина шага переда: ${f(d.stepWidth)}; линия бёдер от талии: ${f(d.hipY)} см.`;
-   let stroke=.6;const drawn=art.cmd.map(c=>{if(c[0]==='W'){stroke=c[1];return '';}if(c[0]==='L')return `<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" stroke="#244d80" fill="none" stroke-width="${stroke}"/>`;return '';}).join('');
+   let stroke=.6,ink='#244d80';const drawn=art.cmd.map(c=>{if(c[0]==='W'){stroke=c[1];return '';}if(c[0]==='K'){ink='#'+c.slice(1).map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');return '';}if(c[0]==='L')return `<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" stroke="${ink}" fill="none" stroke-width="${stroke}"/>`;return '';}).join('');
    preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж передней половинки брюк с контуром и точками">${drawn}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
   }catch(e){out.textContent=e.message;preview.replaceChildren();}
  }
