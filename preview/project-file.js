@@ -2,10 +2,10 @@
   const ranges={height:[120,220],bust:[50,180],waist:[40,180],hip:[60,200],hipheight:[10,40],length:[20,140]};
   function validateProject(input){
     if(!input||input.format!=='mueller-project'||input.version!==1||input.units!=='cm')throw Error('Это не поддерживаемый файл проекта Мюллер (версия 1, сантиметры).');
-    if(!['skirt','skirt90','pants'].includes(input.item))throw Error('Неизвестный вид изделия.');
+    if(!['skirt','skirt90','skirt180','pants'].includes(input.item))throw Error('Неизвестный вид изделия.');
     const measurements={};
     const trouserRanges={waist:[40,180],hip:[60,200],sideLength:[40,160],seatHeight:[10,60],hemCircumference:[10,100],shortening:[0,60],frontDart:[1.5,2.5],frontDartLength:[9,10],backShift:[1,2],seatShapeOffset:[3,5]};
-    for(const [key,[min,max]] of Object.entries(input.item==='pants'?trouserRanges:input.item==='skirt90'?{waist:[40,180],hip:[60,200],hipHeight:[10,40],length:[20,140]}:ranges)){
+    for(const [key,[min,max]] of Object.entries(input.item==='pants'?trouserRanges:['skirt90','skirt180'].includes(input.item)?{waist:[40,180],hip:[60,200],hipHeight:[10,40],length:[20,140]}:ranges)){
       const value=input.measurements?.[key];
       if(typeof value!=='number'||!Number.isFinite(value)||value<min||value>max)throw Error(`Некорректная мерка ${key}: допустимо ${min}–${max} см.`);
       measurements[key]=value;
@@ -14,15 +14,17 @@
     if(!['woven','stretch','leather'].includes(input.material)||![1,2].includes(input.hipEaseHalf))throw Error('Неизвестный материал или прибавка.');
     if(typeof input.name!=='string'||input.name.length>100||typeof input.notes!=='string'||input.notes.length>20000)throw Error('Название или заметки слишком длинные либо повреждены.');
     const result={format:'mueller-project',version:1,units:'cm',name:input.name.trim(),item:input.item,measurements,material:input.material,hipEaseHalf:input.hipEaseHalf,notes:input.notes};
-    if(input.item==='skirt90'){
-      if(input.material!=='woven')throw Error('Полусолнце поддерживает ткань без растяжения.');
-      if(input.modeling!==undefined||input.vent!==undefined||input.skirtKit!==undefined)throw Error('Настройки прямой юбки не относятся к полусолнцу.');
+    if(['skirt90','skirt180'].includes(input.item)){
+      if(input.material!=='woven')throw Error('Круговая юбка поддерживает ткань без растяжения.');
+      if(input.modeling!==undefined||input.vent!==undefined||input.skirtKit!==undefined)throw Error('Настройки прямой юбки не относятся к круговой.');
       const engine=typeof module!=='undefined'?require('./half-circle-kit'):root.HalfCircleKit;
-      result.halfCircle=engine.settings(input.halfCircle);
-      engine.build(measurements,result.halfCircle);
+      const circle=input.item==='skirt180',key=circle?'fullCircle':'halfCircle',other=circle?'halfCircle':'fullCircle';
+      if(input[other]!==undefined)throw Error('Настройки другой круговой модели не подходят к проекту.');
+      result[key]=engine.settings(input[key]);
+      (circle?engine.buildCircle:engine.build)(measurements,result[key]);
       return result;
     }
-    if(input.halfCircle!==undefined)throw Error('Настройки полусолнца относятся только к модели skirt90.');
+    if(input.halfCircle!==undefined||input.fullCircle!==undefined)throw Error('Настройки полусолнца относятся только к модели skirt90.');
     if(input.item==='pants'){
       const engine=typeof module!=='undefined'?require('./trouser-foundation'):root.TrouserFoundation;
       engine.build(measurements);
