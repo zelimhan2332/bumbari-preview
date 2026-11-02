@@ -1,0 +1,206 @@
+{
+  "inventory_date": "2026-10-31",
+  "root": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)",
+  "book_count": 9,
+  "total_pdf_pages": 1231,
+  "books": [
+    {
+      "id": "07_M_Myuler_i_syn_-_Osnovnye_konstruktsii_Sbornik_Biblioteka_zhurnala_Atelye_-_2005",
+      "filename": "07_M_Myuler_i_syn_-_Osnovnye_konstruktsii_Sbornik_Biblioteka_zhurnala_Atelye_-_2005.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\07_M_Myuler_i_syn_-_Osnovnye_konstruktsii_Sbornik_Biblioteka_zhurnala_Atelye_-_2005.pdf",
+      "pdf_pages": 155,
+      "bytes": 20280804,
+      "sha256": "bc7daed171906901db1c2190c0745a59f446e7c0695d70166010fb711adb3859",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Only main basic-constructions PDF pages 2 and 3 visually reviewed; remaining construction pages require review."
+    },
+    {
+      "id": "M_Myuller_i_syn_-_Kak_rabotat_s_naturalnoy_kozh",
+      "filename": "M_Myuller_i_syn_-_Kak_rabotat_s_naturalnoy_kozh.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\M_Myuller_i_syn_-_Kak_rabotat_s_naturalnoy_kozh.pdf",
+      "pdf_pages": 64,
+      "bytes": 9759160,
+      "sha256": "3513ec70f6ab90dd4985d1ef7729eddfc7db21bf78d023690fe39fc5c96a280c",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    },
+    {
+      "id": "M_Myuller_i_syn_Buduarnoe_belye",
+      "filename": "M_Myuller_i_syn_Buduarnoe_belye.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\M_Myuller_i_syn_Buduarnoe_belye.pdf",
+      "pdf_pages": 18,
+      "bytes": 22375091,
+      "sha256": "c80c55ea7a7b40710a2963fc2d56759873d4cba5118970b6445b176f729dd373",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    },
+    {
+      "id": "M_Myuller_i_syn_Ispravlenie_defektov_posadki",
+      "filename": "M_Myuller_i_syn_Ispravlenie_defektov_posadki.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\M_Myuller_i_syn_Ispravlenie_defektov_posadki.pdf",
+      "pdf_pages": 150,
+      "bytes": 119508059,
+      "sha256": "7534abf5ae6fb8888445c7f875648f9b839bdbe805e0d6b7c6edef84dafcb1cb",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    },
+    {
+      "id": "M_Myuller_i_syn_Muzhskaya_odezhda_Klassika_i_avangard",
+      "filename": "M_Myuller_i_syn_Muzhskaya_odezhda_Klassika_i_avangard.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\M_Myuller_i_syn_Muzhskaya_odezhda_Klassika_i_avangard.pdf",
+      "pdf_pages": 194,
+      "bytes": 111878921,
+      "sha256": "c8f16332a61e2d3d586cfded2f5ea82a63ceec134610bda78d46cedb5955401c",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    },
+    {
+      "id": "M_Myuller_i_syn_Muzhskaya_odezhda_ot_A_do_Ya",
+      "filename": "M_Myuller_i_syn_Muzhskaya_odezhda_ot_A_do_Ya.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\M_Myuller_i_syn_Muzhskaya_odezhda_ot_A_do_Ya.pdf",
+      "pdf_pages": 172,
+      "bytes": 57662547,
+      "sha256": "942f7ccd5843b142cc6e3501cdc286f925ab9da9c6725857a31f936214ad9dcd",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    },
+    {
+      "id": "M_Myuller_i_syn_Svadebnye_i_vechernie_platya",
+      "filename": "M_Myuller_i_syn_Svadebnye_i_vechernie_platya.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\M_Myuller_i_syn_Svadebnye_i_vechernie_platya.pdf",
+      "pdf_pages": 218,
+      "bytes": 127876079,
+      "sha256": "98ee1360c18fe0d08315e6fcfa9614a304b2d3a6f3362cdbbbda643e32e56cf3",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    },
+    {
+      "id": "M_Myuller_i_syn_Zhakety_i_Palto",
+      "filename": "M_Myuller_i_syn_Zhakety_i_Palto.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\M_Myuller_i_syn_Zhakety_i_Palto.pdf",
+      "pdf_pages": 104,
+      "bytes": 20663313,
+      "sha256": "307a935c73abc2d9845a79c5ca3653cfa81db83cb69eb486b0154ef3f31c3397",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    },
+    {
+      "id": "Myuller_M_i_syn_Konstruirovanie_Muzhskaya_odezhda_Bazovy_kurs",
+      "filename": "Myuller_M_i_syn_Konstruirovanie_Muzhskaya_odezhda_Bazovy_kurs.pdf",
+      "local_path": "локальный каталог PDF (задайте MUELLER_LIBRARY_ROOT)\\Myuller_M_i_syn_Konstruirovanie_Muzhskaya_odezhda_Bazovy_kurs.pdf",
+      "pdf_pages": 156,
+      "bytes": 124732372,
+      "sha256": "4ace1fc13f16f3eb046743d6b315b41c19fa1934b201863b5002ff175c18e160",
+      "text_layer_sample": {
+        "sampled_pdf_pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "extracted_characters": 0
+      },
+      "content_review": "Not yet visually reviewed"
+    }
+  ]
+}

@@ -7,3 +7,9 @@ node_modules/
 site/
 private/
 client-data/
+ocr-cache/
+sources/private/
+*.epub
+*.djvu
+
+.private-ocr-cache/
