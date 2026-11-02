@@ -69,14 +69,14 @@
   }
   function init(){
     const T=window.THREE,data=window.MUELLER_HUMAN_DATA;
-    const scene=new T.Scene();scene.background=new T.Color('#243c3e');
+    const scene=new T.Scene();scene.background=new T.Color('#f3f6fa');
     const camera=new T.PerspectiveCamera(34,1,1,1500);camera.position.set(135,103,340);
     const renderer=new T.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(340,390);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;
     const controls=new window.HumanOrbitControls(camera,renderer.domElement);controls.target.set(0,88,0);controls.update();controls.enablePan=false;controls.enableZoom=true;controls.minDistance=230;controls.maxDistance=480;controls.minPolarAngle=.32;controls.maxPolarAngle=2.5;
     scene.add(new T.HemisphereLight(0xffffff,0xb8b1a1,2.5));const key=new T.DirectionalLight(0xfff5e4,3.8);key.position.set(-100,220,150);scene.add(key);const rim=new T.DirectionalLight(0xe2efff,2);rim.position.set(100,150,-120);scene.add(rim);
     const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(data.positions,3));geometry.setIndex(data.indices);geometry.computeVertexNormals();
     const body=new T.Mesh(geometry,new T.MeshStandardMaterial({color:0xbfc9c4,roughness:.95,metalness:0}));scene.add(body);
-    const floor=new T.Mesh(new T.CircleGeometry(62,64),new T.MeshStandardMaterial({color:0x385558,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.6;scene.add(floor);
+    const floor=new T.Mesh(new T.CircleGeometry(62,64),new T.MeshStandardMaterial({color:0xe2e8f0,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.6;scene.add(floor);
     const marks=new T.Group();scene.add(marks);
     const garments=new T.Group();scene.add(garments);
     state={scene,camera,renderer,controls,geometry,marks,garments,values:null,active:null};
@@ -112,11 +112,11 @@
           const envelope=window.skirtEnvelope(v,window.MUELLER_HUMAN_DATA.sections,{...options,body:{positions:s.geometry.attributes.position.array,indices:window.MUELLER_HUMAN_DATA.indices,base:window.MUELLER_HUMAN_DATA.positions}});
           if(envelope){
             const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(envelope.positions,3));geometry.setIndex(envelope.indices);geometry.computeVertexNormals();
-            s.garments.add(new T.Mesh(geometry,new T.MeshStandardMaterial({color:0x245caa,roughness:.86,side:T.DoubleSide})));
+            s.garments.add(new T.Mesh(geometry,new T.MeshStandardMaterial({color:new T.Color(options.garmentColor||'#142d50'),roughness:.86,side:T.DoubleSide})));
             // The top and hem edges make the garment length and opening easy to see.
             for(const row of [0,envelope.rows]){
               const points=Array.from({length:envelope.segments},(_,j)=>new T.Vector3(...envelope.positions.slice((row*envelope.segments+j)*3,(row*envelope.segments+j)*3+3)));
-              s.garments.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points,true,'centripetal'),128,.18,6,true),new T.MeshBasicMaterial({color:0xaacaff})));
+              s.garments.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points,true,'centripetal'),128,.18,6,true),new T.MeshBasicMaterial({color:new T.Color(options.garmentColor||'#142d50').multiplyScalar(.72)})));
             }
             s.garmentAvailable=true;
           }
