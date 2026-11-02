@@ -16,7 +16,7 @@
  document.getElementById('s3').append(host);
  function refresh(){
   const n=id=>Number(document.getElementById(id).value),out=document.getElementById('flare-result');
-  try{const r=flareControl({frontCuts:[n('front-cut-1'),n('front-cut-2')],frontSide:n('front-side'),backCuts:[n('back-cut-1'),n('back-cut-2')],backSide:n('back-side')});const f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});out.textContent=`Перед: ${f(r.frontTotal)} см; спинка: ${f(r.backTotal)} см. ${r.balanced?'Суммы расширения согласованы.':'Разница '+f(r.difference)+' см: проверьте распределение.'} ${r.source}. Равенство сумм не подтверждает геометрию или посадку.`;}catch(e){out.textContent=e.message;}
+  try{const r=flareControl({frontCuts:[n('front-cut-1'),n('front-cut-2')],frontSide:n('front-side'),backCuts:[n('back-cut-1'),n('back-cut-2')],backSide:n('back-side')});const f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});out.textContent=`Перед: ${f(r.frontTotal)} см; спинка: ${f(r.backTotal)} см. ${r.balanced?'Суммы расширения согласованы.':'Разница '+f(r.difference)+' см: проверьте распределение.'}  Равенство сумм не подтверждает геометрию или посадку.`;}catch(e){out.textContent=e.message;}
  }
  host.addEventListener('input',refresh);refresh();
 })(typeof window!=='undefined'?window:globalThis);
