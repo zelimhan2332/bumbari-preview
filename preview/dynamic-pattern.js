@@ -77,12 +77,16 @@ const status=document.getElementById('print-status');
 for(const format of ['a4','plotter'])document.getElementById('format-'+format).addEventListener('click',()=>{status.textContent=format==='a4'?'Печать 1:1 на А4, нахлёст 10 мм.':'Печать 1:1 на А0 для плоттера.';});
 for(const id of ['print-scheme','download-scheme-pdf'])document.getElementById(id).onclick=()=>{
  try{
+  const reference=calc({waist:number('waist'),hip:number('hip'),hipHeight:number('hipheight'),length:number('length'),hipEaseHalf:Number(document.getElementById('hip-ease').value),material:document.getElementById('material').value}).exactBookCase;
+  const readiness=root.printReadiness({reference,modeling:root.getSkirtModeling?.(),vent:root.getSkirtVent?.(),experimentalConsent:document.getElementById('experimental-print-consent').checked});
+  if(!readiness.allowed)throw Error(readiness.errors.join(' '));
   const v={waist:number('waist'),hip:number('hip'),hipHeight:number('hipheight'),length:number('length'),hipEaseHalf:Number(document.getElementById('hip-ease').value),material:document.getElementById('material').value},d=build(v),a=artwork(d),tiles=pages(a,root.muellerPrintFormat),bytes=pdf(a,tiles);
    const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'})),link=document.createElement('a');link.href=url;if(id==='download-scheme-pdf')link.download=`bumbari-${v.waist}-${v.hip}-1to1.pdf`;else{link.target='_blank';link.rel='noopener';}document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
   status.textContent=`Лекало построено по текущим меркам: ${tiles.length} листов. Талия по шву ${(d.geometry.audit.waist*2).toFixed(2)} см. Боковые швы согласованы. Печатать 100%; квадрат 10 × 10 см. ${d.reference?'Контрольный пример.':'Расчётное распределение вытачек, посадка не проверена.'} Сначала пробник.`;
  }catch(e){status.textContent='Построение остановлено: '+e.message;}
 };
 const note=document.createElement('p');note.textContent='Лекало 1:1 строится по текущим меркам. А4: нахлёст 10 мм, сборка по R (ряд) и C (колонка). Плоттер: А0. Печатать 100%, без подгонки. Контуры БЕЗ припусков: добавьте 1 см по талии, 1,5 см по бокам и середине спинки, 3 см по низу, 1 см вокруг пояса. По сгибу переда припуска нет. Вытачки не вырезать. Сначала сшейте пробник.';status.before(note);
+const consent=document.createElement('label');consent.innerHTML='<input id="experimental-print-consent" type="checkbox"> Разрешить учебный PDF с экспериментальным распределением вытачек. Не считать готовым лекалом для раскроя.';status.before(consent);
 function refresh(){
  try{const d=build({waist:number('waist'),hip:number('hip'),hipHeight:number('hipheight'),length:number('length'),hipEaseHalf:Number(document.getElementById('hip-ease').value),material:document.getElementById('material').value});document.getElementById('calculation-note').textContent='Контуры пересчитаны по текущим меркам. Талия по шву: '+(d.geometry.audit.waist*2).toFixed(2)+' см (включая 2 см прибавки). Боковые швы согласованы. '+(d.reference?'Основа контрольного примера.':'Распределение вытачек расчётное, посадка не проверена.')+' Для первого пошива используйте пробную ткань.';}catch(e){document.getElementById('calculation-note').textContent=e.message;}
 }

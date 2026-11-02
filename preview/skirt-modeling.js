@@ -20,10 +20,10 @@
  root.taperSkirt=taperSkirt;
  if(typeof module!=='undefined'){module.exports={taperSkirt};return;}
  const host=document.createElement('section');host.className='note';
- host.innerHTML='<h3>Заужение юбки · построение по инструкции</h3><p>Учебные линии моделирования, не отдельное готовое лекало. Основа и талия не изменяются. Для свободы движения книге нужны шлица или складка; схема припуска шлицы приведена ниже. Для раскроя ещё нужен полный комплект деталей.</p><label>Начало ниже бёдер, см <input id="taper-start" type="number" min="8" max="10" step="0.5" value="9"></label> <label>Заужение каждого бокового среза у низа, см <input id="taper-reduction" type="number" min="0" max="2" step="0.5" value="1"></label><p>Диапазон заужения 0–2 см ограничен прототипом. В книге величина связана с длиной и моделью, а не вычисляется одной универсальной формулой.</p><p id="taper-result" aria-live="polite"></p><div id="taper-preview"></div>';
+ host.innerHTML='<h3>Заужение юбки · построение по инструкции</h3><p>Учебные линии моделирования, не отдельное готовое лекало. Основа и талия не изменяются. Для свободы движения книге нужны шлица или складка; схема припуска шлицы приведена ниже. Для раскроя ещё нужен полный комплект деталей.</p><label><input id="taper-enabled" type="checkbox"> Использовать заужение</label><label>Начало ниже бёдер, см <input id="taper-start" type="number" min="8" max="10" step="0.5" value="9"></label> <label>Заужение каждого бокового среза у низа, см <input id="taper-reduction" type="number" min="0" max="2" step="0.5" value="1"></label><p>Диапазон заужения 0–2 см ограничен прототипом. В книге величина связана с длиной и моделью, а не вычисляется одной универсальной формулой.</p><p id="taper-result" aria-live="polite"></p><div id="taper-preview"></div>';
  document.getElementById('s3').append(host);
- root.getSkirtModeling=()=>({kind:'taper-study',startBelowHip:Number(document.getElementById('taper-start').value),hemReduction:Number(document.getElementById('taper-reduction').value)});
- root.setSkirtModeling=m=>{
+ root.getSkirtModeling=()=>document.getElementById('taper-enabled').checked?({kind:'taper-study',startBelowHip:Number(document.getElementById('taper-start').value),hemReduction:Number(document.getElementById('taper-reduction').value)}):undefined;
+ root.setSkirtModeling=m=>{document.getElementById('taper-enabled').checked=!!m;
   document.getElementById('taper-start').value=m?.startBelowHip??9;
   document.getElementById('taper-reduction').value=m?.hemReduction??1;
   refresh();
