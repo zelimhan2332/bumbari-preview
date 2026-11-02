@@ -8,6 +8,10 @@
 
 Открой `preview/index.html` в Chrome. Запустить проверки из PowerShell можно командой `Get-ChildItem preview -Filter '*.test.js' | ForEach-Object { node $_.FullName }`. Детали готовности и известные ограничения — в [IMPLEMENTATION.md](IMPLEMENTATION.md). Основная памятка для новых чатов и ИИ — [docs/PROJECT-HANDOFF-RU.md](docs/PROJECT-HANDOFF-RU.md).
 
+## Брюки в общем интерфейсе
+
+Выберите «Поясные изделия → Классические брюки» и пройдите шаги «Мерки → Лекала → Печать». Мерки брюк сохраняются и открываются в файле проекта отдельно от мерок юбки; поддерживаются точка и запятая. PDF пока содержит переднюю половинку и вспомогательную сетку спинки, без полного комплекта и припусков. Готовность к раскрою и посадка не подтверждены.
+
 ## Методика и книги
 
 Работаем по «Мюллер и сын». Навык и собственные справочные заметки: [skills/mueller-patternmaking/SKILL.md](skills/mueller-patternmaking/SKILL.md). Каталог книг и этапы изучения: [docs/SOURCES.md](docs/SOURCES.md), [docs/STUDY.md](docs/STUDY.md).

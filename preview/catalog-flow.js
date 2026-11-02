@@ -19,18 +19,18 @@
   ];
   const home=document.getElementById('category-home'),catalog=document.getElementById('model-catalog'),cards=catalog.querySelector('.cards'),next=document.getElementById('next1');
   home.innerHTML=categories.map(([id,title,description])=>`<button class="category-card" data-family="${id}">${svg(shapes[id])}<strong>${title}</strong><small>${description}</small></button>`).join('');
-  cards.innerHTML=models.map(([id,group,title,shape])=>`<button class="card${id===item?' selected':''}" data-item="${id}" data-family="${group}"><span class="icon">${svg(shapes[shape])}</span><strong>${title}</strong><small>${id==='skirt'?'Учебная демонстрация':'Планируется · построения пока нет'}</small></button>`).join('');
+  cards.innerHTML=models.map(([id,group,title,shape])=>`<button class="card${id===item?' selected':''}" data-item="${id}" data-family="${group}"><span class="icon">${svg(shapes[shape])}</span><strong>${title}</strong><small>${id==='skirt'?'Учебная демонстрация':id==='pants'?'Передняя половинка · неполный комплект':'Планируется · построения пока нет'}</small></button>`).join('');
   home.querySelectorAll('button').forEach(button=>button.onclick=()=>{
     home.hidden=true;catalog.hidden=false;
     document.getElementById('category-title').textContent=categories.find(c=>c[0]===button.dataset.family)[1]+' · выберите модель';
     cards.querySelectorAll('[data-item]').forEach(card=>card.hidden=card.dataset.family!==button.dataset.family);
-    next.hidden=button.dataset.family!=='lower';next.disabled=item!=='skirt';
+    next.hidden=button.dataset.family!=='lower';next.disabled=!['skirt','pants'].includes(item);
   });
   document.getElementById('back-categories').onclick=()=>{home.hidden=false;catalog.hidden=true;next.hidden=true;};
   cards.querySelectorAll('[data-item]').forEach(card=>card.onclick=()=>{
     item=card.dataset.item;cards.querySelectorAll('[data-item]').forEach(c=>c.classList.toggle('selected',c===card));
-    next.hidden=false;next.disabled=item!=='skirt';
-    document.getElementById('catalog-note').textContent=item==='skirt'?'Прямая юбка: доступен ввод мерок и учебное построение. Точные лекала для раскроя ещё проверяются.':'Эта конструкция запланирована. Расчёт и мерки появятся после проверки методики Мюллера.';
+    next.hidden=false;next.disabled=!['skirt','pants'].includes(item);
+    document.getElementById('catalog-note').textContent=item==='skirt'?'Прямая юбка: доступен ввод мерок и учебное построение. Точные лекала для раскроя ещё проверяются.':item==='pants'?'Классические брюки: передняя половинка и направляющие спинки. Полный комплект для раскроя ещё не готов.':'Эта конструкция запланирована. Расчёт и мерки появятся после проверки методики Мюллера.';
     render();
   });
   document.getElementById('build-from-top').onclick=()=>document.getElementById('next2').click();
