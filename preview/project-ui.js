@@ -5,7 +5,7 @@
   const currentProject=()=>MuellerProject.validateProject({format:'mueller-project',version:1,units:'cm',name:nameInput.value,item,measurements:Object.fromEntries(fields.map(key=>[key,number(key)])),material:document.getElementById('material').value,hipEaseHalf:Number(document.getElementById('hip-ease').value),notes:document.getElementById('fit-notes').value});
   document.getElementById('save-project').onclick=()=>{
     try{
-      const data=MuellerProject.validateProject({...currentProject(),modeling:window.getSkirtModeling?.()}),blob=new Blob([JSON.stringify({...data,savedAt:new Date().toISOString(),appVersion:'0.5'},null,2)],{type:'application/json'});
+      const data=MuellerProject.validateProject({...currentProject(),modeling:window.getSkirtModeling?.(),vent:window.getSkirtVent?.()}),blob=new Blob([JSON.stringify({...data,savedAt:new Date().toISOString(),appVersion:'0.5'},null,2)],{type:'application/json'});
       const link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;
       link.download=(data.name||'Bumbari-юбка').replace(/[\\/:*?"<>|\x00-\x1f]/g,'-').slice(0,80)+'.mueller.json';
       document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -33,6 +33,7 @@
     nameInput.value=data.name;document.getElementById('material').value=data.material;document.getElementById('hip-ease').value=data.hipEaseHalf;
     document.getElementById('fit-notes').value=data.notes;item=data.item;current=2;
     window.setSkirtModeling?.(data.modeling);
+    window.setSkirtVent?.(data.vent);
     document.querySelectorAll('[data-item]').forEach(card=>card.classList.toggle('selected',card.dataset.item===item));
     document.getElementById('next1').disabled=false;
     // Imported items must remain visible even if a different catalogue filter was selected.

@@ -18,6 +18,11 @@
       if(!m||m.kind!=='taper-study'||!Number.isFinite(m.startBelowHip)||m.startBelowHip<8||m.startBelowHip>10||!Number.isFinite(m.hemReduction)||m.hemReduction<0||m.hemReduction>2)throw Error('Некорректные настройки учебного заужения.');
       result.modeling={kind:'taper-study',startBelowHip:m.startBelowHip,hemReduction:m.hemReduction};
     }
+    if(input.vent!==undefined){
+      const v=input.vent;
+      if(!v||!Number.isFinite(v.width)||v.width<4||v.width>7||!Number.isFinite(v.ventLength)||v.ventLength<=0||v.ventLength>=measurements.length-measurements.hipheight)throw Error('Некорректные параметры шлицы: проверьте длину, ширину и положение относительно бёдер.');
+      result.vent={ventLength:v.ventLength,width:v.width};
+    }
     return result;
   }
   function parseProject(text){

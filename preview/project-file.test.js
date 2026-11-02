@@ -12,3 +12,7 @@ const modeled={...original,modeling:{kind:'taper-study',startBelowHip:10,hemRedu
 assert.deepEqual(parseProject(JSON.stringify(modeled)),modeled);
 for(const modeling of [null,{kind:'unknown',startBelowHip:9,hemReduction:1},{kind:'taper-study',startBelowHip:7,hemReduction:1},{kind:'taper-study',startBelowHip:9,hemReduction:3},{kind:'taper-study',startBelowHip:'9',hemReduction:1}])assert.throws(()=>validateProject({...original,modeling}));
 console.log('Optional modeling: backward compatibility, lossless round trip and invalid settings OK');
+const vented={...original,vent:{ventLength:16,width:5}};
+assert.deepEqual(parseProject(JSON.stringify(vented)),vented);
+for(const vent of [null,{ventLength:0,width:5},{ventLength:50,width:5},{ventLength:16,width:3},{ventLength:16,width:'5'}])assert.throws(()=>validateProject({...original,vent}));
+console.log('Vent project settings: round trip and boundary validation OK');
