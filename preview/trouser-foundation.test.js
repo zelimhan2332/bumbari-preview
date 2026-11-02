@@ -8,12 +8,21 @@ assert.equal(d.hipY,18.5);assert.equal(d.crease,15);assert.equal(d.hemHalf,9.5);
 assert.equal(d.points[15].x,5.5);assert.equal(d.points[16].x,24.5);
 for(const [name,p] of Object.entries(d.points))assert(Number.isFinite(p.x)&&Number.isFinite(p.y),name);
 assert(d.points[17].x>d.frontWidth);assert.equal(d.points[13].y,58.3);
+assert.equal(d.front.dart.intake,2);assert.equal(d.front.dart.length,9.5);
+assert.equal(d.points[20].x,d.points[8].x+.5);
+assert.equal(d.points[20].y,0);
+assert.equal(d.points[21].x,d.points[20].x-v.waist/4-d.front.dart.intake-.25);
+assert.equal(d.points[22].y-d.points[21].y,1.25);
+assert.deepEqual(d.front.outline[0],d.front.outline.at(-1),'front contour closes');
+assert(d.front.outline.length>40,'front contour uses interpolated construction points');
 for(const hip of [90,100,120]){
  const g=T.build({...v,hip}),art=T.artwork(g),tiles=P.pages(art,'a4');
  assert(Math.abs(g.frontWidth+g.backWidth-hip/2)<1e-9);
  assert(Math.abs(g.points[11].x*2-(g.frontWidth+g.stepWidth))<1e-9);
- const pdf=Buffer.from(P.pdf(art,tiles)).toString();assert(pdf.includes('NOT A CUTTING PATTERN'));
+ const pdf=Buffer.from(P.pdf(art,tiles)).toString();assert(pdf.includes('FRONT ONLY / BACK HALF NOT BUILT'));
+ assert(pdf.includes('3.9685 w'),'PDF preserves 1.4 mm cut contour width');
+ assert(pdf.includes('CONTROL 100 x 100 mm'));
  assert(tiles.at(-1).x+190>=art.width&&tiles.at(-1).y+277>=art.height);
 }
-for(const override of [{seatHeight:0},{hip:60},{sideLength:20},{shortening:100},{backEase:2},{hemTurn:9},{stepExtra:0},{hemCircumference:Infinity}])assert.throws(()=>T.build({...v,...override}));
-console.log('Trouser foundation: book controls, point geometry, scaled PDF and invalid inputs OK');
+for(const override of [{seatHeight:0},{hip:60},{sideLength:20},{shortening:100},{backEase:2},{hemTurn:9},{stepExtra:0},{hemCircumference:Infinity},{frontDart:1},{frontDartLength:11},{frontWaistEase:1}])assert.throws(()=>T.build({...v,...override}));
+console.log('Trouser front: source controls, contour, dart, scaled PDF and invalid inputs OK');
