@@ -34,7 +34,7 @@
     render();
     if(item==='skirt90') document.getElementById('catalog-note').innerHTML=window.Skirt90Draft.panel({waist:number('waist'),length:number('length')});
   });
-  ['waist','length'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{if(item==='skirt90')document.getElementById('catalog-note').innerHTML=window.Skirt90Draft.panel({waist:number('waist'),length:number('length')});}));
+  document.getElementById('catalog-note').addEventListener('input',event=>{const input=event.target.closest('[data-skirt90-measure]');if(!input||item!=='skirt90')return;const values={};document.querySelectorAll('[data-skirt90-measure]').forEach(field=>values[field.dataset.skirt90Measure]=Number(field.value.replace(',','.')));document.querySelector('[data-skirt90-output]').innerHTML=window.Skirt90Draft.output(values);});
   document.getElementById('build-from-top').onclick=()=>document.getElementById('next2').click();
   // Editing a measurement should expose its measurement line rather than hide it under clothing.
   fields.forEach(key=>document.getElementById(key).addEventListener('focus',()=>{previewMode='measures';render();}));
