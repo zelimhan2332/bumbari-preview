@@ -32,7 +32,7 @@
     next.hidden=false;next.disabled=!['skirt','pants'].includes(item);
     document.getElementById('catalog-note').textContent=item==='skirt'?'Прямая юбка: доступен ввод мерок и учебное построение. Точные лекала для раскроя ещё проверяются.':item==='skirt90'?'Юбка 90°: фото готового изделия и черновой геометрический сектор. Лекало ещё не готово к раскрою.':item==='pants'?'Классические брюки: передняя половинка и направляющие спинки. Полный комплект для раскроя ещё не готов.':'Эта конструкция запланирована. Расчёт и мерки появятся после проверки методики Мюллера.';
     render();
-    if(item==='skirt90') document.getElementById('catalog-note').innerHTML=window.Skirt90Draft.panel({waist:number('waist'),length:number('length')});
+    if(item==='skirt90') document.getElementById('catalog-note').innerHTML=window.Skirt90Draft.panel({waist:number('waist'),hip:number('hip'),hipHeight:number('hipheight'),length:number('length')});
   });
   document.getElementById('catalog-note').addEventListener('input',event=>{const input=event.target.closest('[data-skirt90-measure]');if(!input||item!=='skirt90')return;const values={};document.querySelectorAll('[data-skirt90-measure]').forEach(field=>values[field.dataset.skirt90Measure]=Number(field.value.replace(',','.')));document.querySelector('[data-skirt90-output]').innerHTML=window.Skirt90Draft.output(values);});
   document.getElementById('build-from-top').onclick=()=>document.getElementById('next2').click();
