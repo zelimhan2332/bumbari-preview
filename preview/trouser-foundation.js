@@ -88,7 +88,7 @@
  if(typeof module!=='undefined'){module.exports=root.TrouserFoundation;return;}
  const host=document.createElement('section');host.className='panel';host.style.marginTop='22px';
  const fields=[['waist','Талия',76],['hip','Бёдра',100],['sideLength','Длина сбоку до пола',106],['seatHeight','Высота сидения',26.5],['hemCircumference','Полный обхват низа одной штанины',42],['shortening','Укорочение от пола',3.5],['frontDart','Раствор передней вытачки',2],['frontDartLength','Длина передней вытачки',9.5],['backShift','Сдвиг задней части, шаг 4',1.5],['seatShapeOffset','Отступ по форме ягодиц: выпуклые 3, плоские 5',4]];
- host.innerHTML='<div class="form">'+fields.map(([key,label,value])=>`<label>${label}<input id="trouser-${key}" inputmode="decimal" value="${value}"></label>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать переднюю половинку 1:1</button>';
+ host.innerHTML='<div class="form">'+fields.map(([key,label,value])=>`<div class="field"><label for="trouser-${key}">${label}</label><div class="wrap"><input id="trouser-${key}" inputmode="decimal" value="${value}"><em>см</em></div></div>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать переднюю половинку 1:1</button>';
 
  // Keep existing skirt controls and their listeners together; use the same four steps.
  const skirtPanels={},trouserPanels={};
@@ -99,7 +99,7 @@
   section.append(skirt,pants);skirtPanels[step]=skirt;trouserPanels[step]=pants;
  }
  const heading=(panel,title,copy)=>{const h=document.createElement('h2'),p=document.createElement('p');h.textContent=title;p.textContent=copy;panel.append(h,p);};
- const action=(panel,label,step,validate=false)=>{const b=document.createElement('button');b.className='primary';b.textContent=label;b.onclick=()=>{try{if(validate)buildTrouserFoundation(values());go(step);}catch(e){document.getElementById('trouser-error').textContent=e.message;}};panel.append(b);};
+ const action=(panel,label,step,validate=false)=>{const b=document.createElement('button');b.className='primary';b.textContent=label;b.onclick=()=>{try{if(validate)buildTrouserFoundation(values());go(step);}catch(e){document.getElementById('trouser-error').textContent=e.message;}};let actions=panel.querySelector('.actions');if(!actions){actions=document.createElement('div');actions.className='actions';panel.append(actions);}actions.append(b);};
  heading(trouserPanels[2],'Мерки для классических брюк','Все размеры в сантиметрах. Сейчас доступны передняя половинка и вспомогательные линии спинки; полный комплект ещё не готов.');
  trouserPanels[2].append(host.querySelector('.form'));
  const error=document.createElement('p');error.id='trouser-error';error.setAttribute('role','alert');trouserPanels[2].append(error);
