@@ -125,7 +125,7 @@
  guideSteps.className='guide-stages';
  guideSteps.setAttribute('role','group');
  guideSteps.setAttribute('aria-label','Этапы построения задней половинки');
- guideSteps.innerHTML='<button type="button" class="secondary" data-back-stage="1" aria-pressed="true">Шаг 1 · Опоры спинки 25–35</button><button type="button" class="secondary" data-back-stage="2" aria-pressed="false">Шаг 2 · Талия и вытачка 36–38</button>';
+ guideSteps.innerHTML='<button type="button" class="secondary" data-back-stage="1" aria-pressed="true">Шаг 1 · Опоры спинки 25–35</button><button type="button" class="secondary" data-back-stage="2" aria-pressed="false">Шаг 2 · Талия и вытачка 36–38</button><button type="button" class="secondary" data-back-stage="3" aria-pressed="false">Шаг 3 · Перпендикуляр из 38</button>';
  const guideCopy=document.createElement('p');
  guideCopy.className='muted';
  guideCopy.id='trouser-guide-copy';
@@ -138,7 +138,9 @@
   guideSteps.querySelectorAll('[data-back-stage]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
   guideCopy.textContent=backStage===1
    ?'Шаг 1. Сверьте верхнюю опору, линию бёдер и направляющие колена и низа. Выбранные линии задней половинки выделены оранжевым.'
-   :'Шаг 2. Проверьте отрезок 36–37, верхнюю линию 37–38 и вытачку. Точка 36 размещена на линии талии как цифровая интерпретация рисунка.';
+   :backStage===2
+    ?'Шаг 2. Проверьте отрезок 36–37, верхнюю линию 37–38 и вытачку. Точка 36 размещена на линии талии как цифровая интерпретация рисунка.'
+    :'Шаг 3. От точки 38 показано направление перпендикуляра к 37–38. Длина стрелки условная (1,5 см на экране), точка 39 не рассчитывается и в лекало/PDF не входит.';
   refresh();
  }));
  action(trouserPanels[3],'← Изменить мерки',2);action(trouserPanels[3],'Печать →',4,true);
@@ -155,11 +157,17 @@
    let stroke=.6,ink='#244d80';const drawn=art.cmd.map(c=>{if(c[0]==='W'){stroke=c[1];return '';}if(c[0]==='K'){ink='#'+c.slice(1).map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');return '';}if(c[0]==='L')return `<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" stroke="${ink}" fill="none" stroke-width="${stroke}"/>`;return '';}).join('');
    const backPairs=backStage===1
    ?[[11,25],[25,26],[26,27],[7,26],[28,29],[29,30],[32,29],[29,35],[30,31],[32,33],[31,34],[33,'33a'],[34,'34a']]
-   :[[35,36],[36,37],[37,38]];
+   :backStage===2?[[35,36],[36,37],[37,38]]:[];
   const px=n=>20+n*10,py=n=>25+n*10;
   const highlight=backPairs.map(([a,b])=>{const u=d.points[a],v=d.points[b];return `<path d="M${px(u.x)} ${py(u.y)}L${px(v.x)} ${py(v.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`;}).join('');
+  const normalAxis={x:d.points[38].x-d.points[37].x,y:d.points[38].y-d.points[37].y};
+  const normalLength=Math.hypot(normalAxis.x,normalAxis.y)||1;
+  let normal={x:normalAxis.y/normalLength,y:-normalAxis.x/normalLength};
+  if(normal.y>0)normal={x:-normal.x,y:-normal.y};
+  const normalEnd={x:d.points[38].x+normal.x*1.5,y:d.points[38].y+normal.y*1.5};
+  const perpendicularCue=backStage===3?`<path d="M${px(d.points[38].x)} ${py(d.points[38].y)}L${px(normalEnd.x)} ${py(normalEnd.y)}" stroke="#d17b17" stroke-width="2.8" stroke-dasharray="5 3" fill="none"/><circle cx="${px(normalEnd.x)}" cy="${py(normalEnd.y)}" r="2.5" fill="#d17b17"/><text x="${px(normalEnd.x)+4}" y="${py(normalEnd.y)-4}" font-size="10" fill="#8a4e0b">направление 39 · условно</text>`:'';
   const dart=backStage===2?`<path d="M${px(d.backGuide.dart.left.x)} ${py(d.backGuide.dart.left.y)}L${px(d.backGuide.dart.apex.x)} ${py(d.backGuide.dart.apex.y)}L${px(d.backGuide.dart.right.x)} ${py(d.backGuide.dart.right.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`:'';
-  preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж брюк, этап ${backStage} задней половинки">${drawn}${highlight}${dart}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
+  preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж брюк, этап ${backStage} задней половинки">${drawn}${highlight}${dart}${perpendicularCue}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
   }catch(e){out.textContent=e.message;document.getElementById('trouser-error').textContent=e.message;preview.replaceChildren();}
  }
 
