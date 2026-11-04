@@ -121,7 +121,26 @@
  const error=document.createElement('p');error.id='trouser-error';error.setAttribute('role','alert');trouserPanels[2].append(error);
  action(trouserPanels[2],'← Выбрать изделие',1);action(trouserPanels[2],'Построить →',3,true);
  heading(trouserPanels[3],'Чертёж основы брюк','Передняя половинка и направляющие спинки. Это неполный комплект, без припусков; посадка не проверена.');
- trouserPanels[3].append(host.querySelector('#trouser-result'),host.querySelector('#trouser-preview'));
+ const guideSteps=document.createElement('div');
+ guideSteps.className='guide-stages';
+ guideSteps.setAttribute('role','group');
+ guideSteps.setAttribute('aria-label','Этапы построения задней половинки');
+ guideSteps.innerHTML='<button type="button" class="secondary" data-back-stage="1" aria-pressed="true">Шаг 1 · Опоры спинки 25–35</button><button type="button" class="secondary" data-back-stage="2" aria-pressed="false">Шаг 2 · Талия и вытачка 36–38</button>';
+ const guideCopy=document.createElement('p');
+ guideCopy.className='muted';
+ guideCopy.id='trouser-guide-copy';
+ guideCopy.setAttribute('aria-live','polite');
+ guideCopy.textContent='Шаг 1. Сверьте верхнюю опору, линию бёдер и направляющие колена и низа. Выбранные линии задней половинки выделены оранжевым.';
+ trouserPanels[3].append(guideSteps,guideCopy,host.querySelector('#trouser-result'),host.querySelector('#trouser-preview'));
+ let backStage=1;
+ guideSteps.querySelectorAll('[data-back-stage]').forEach(button=>button.addEventListener('click',()=>{
+  backStage=Number(button.dataset.backStage);
+  guideSteps.querySelectorAll('[data-back-stage]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
+  guideCopy.textContent=backStage===1
+   ?'Шаг 1. Сверьте верхнюю опору, линию бёдер и направляющие колена и низа. Выбранные линии задней половинки выделены оранжевым.'
+   :'Шаг 2. Проверьте отрезок 36–37, верхнюю линию 37–38 и вытачку. Точка 36 размещена на линии талии как цифровая интерпретация рисунка.';
+  refresh();
+ }));
  action(trouserPanels[3],'← Изменить мерки',2);action(trouserPanels[3],'Печать →',4,true);
  heading(trouserPanels[4],'Печать передней половинки брюк','Учебный PDF 1:1 на A4. Содержит переднюю деталь и вспомогательные линии спинки. Задней детали и припусков нет — для раскроя полного изделия не подходит. Печатайте 100%, без подгонки; проверьте квадрат 100 × 100 мм.');
  trouserPanels[4].append(host.querySelector('#trouser-export'));
@@ -134,7 +153,13 @@
   try{document.getElementById('trouser-error').textContent='';const d=buildTrouserFoundation(values()),art=foundationArtwork(d),f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
    out.textContent=`Длина шага: ${f(d.inseam)}; от сидения до колена: ${f(d.kneeFromSeat)}; ширина передней сетки: ${f(d.frontWidth)}; ширина шага переда: ${f(d.stepWidth)}; линия бёдер от талии: ${f(d.hipY)} см.`;
    let stroke=.6,ink='#244d80';const drawn=art.cmd.map(c=>{if(c[0]==='W'){stroke=c[1];return '';}if(c[0]==='K'){ink='#'+c.slice(1).map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');return '';}if(c[0]==='L')return `<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" stroke="${ink}" fill="none" stroke-width="${stroke}"/>`;return '';}).join('');
-   preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж передней половинки брюк с контуром и точками">${drawn}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
+   const backPairs=backStage===1
+   ?[[11,25],[25,26],[26,27],[7,26],[28,29],[29,30],[32,29],[29,35],[30,31],[32,33],[31,34],[33,'33a'],[34,'34a']]
+   :[[35,36],[36,37],[37,38]];
+  const px=n=>20+n*10,py=n=>25+n*10;
+  const highlight=backPairs.map(([a,b])=>{const u=d.points[a],v=d.points[b];return `<path d="M${px(u.x)} ${py(u.y)}L${px(v.x)} ${py(v.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`;}).join('');
+  const dart=backStage===2?`<path d="M${px(d.backGuide.dart.left.x)} ${py(d.backGuide.dart.left.y)}L${px(d.backGuide.dart.apex.x)} ${py(d.backGuide.dart.apex.y)}L${px(d.backGuide.dart.right.x)} ${py(d.backGuide.dart.right.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`:'';
+  preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж брюк, этап ${backStage} задней половинки">${drawn}${highlight}${dart}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
   }catch(e){out.textContent=e.message;document.getElementById('trouser-error').textContent=e.message;preview.replaceChildren();}
  }
 
