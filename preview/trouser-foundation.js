@@ -96,9 +96,17 @@
   const backInseam=through([points[39],points[31],points[34]]);
   const backCrotch=through([points[37],points[28],points[39]]);
   const backWaist=through([points['35a'],points[38],points[37]]);
+  // Step 7 view only: fold one dart side about its apex; this does not replace the cut contour.
+  const rotateAround=(q,c,a)=>{const dx=q.x-c.x,dy=q.y-c.y,co=Math.cos(a),si=Math.sin(a);return{x:c.x+dx*co-dy*si,y:c.y+dx*si+dy*co};};
+  const closureRightVec={x:backDartShape.right.x-backDartShape.apex.x,y:backDartShape.right.y-backDartShape.apex.y};
+  const closureLeftVec={x:backDartShape.left.x-backDartShape.apex.x,y:backDartShape.left.y-backDartShape.apex.y};
+  const dartCloseAngle=Math.atan2(closureRightVec.x*closureLeftVec.y-closureRightVec.y*closureLeftVec.x,closureRightVec.x*closureLeftVec.x+closureRightVec.y*closureLeftVec.y);
+  const closed37=rotateAround(points[37],backDartShape.apex,dartCloseAngle);
+  const closedDartWaist=through([points[38],backDartShape.left,closed37]);
+  const backDartClosure={angle:dartCloseAngle,closed37,waist:closedDartWaist};
   const backOutline=[...backWaist,...backCrotch.slice(1),...backInseam.slice(1),points[33],...backSide.slice(0,-1).reverse()];
   const backSideLength=curveLength(backSide),backInseamLength=curveLength(backInseam);
-  return {values:{...v,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset,backLengthReduction,backTopShift,backDart,backDartLength,backWaistEase,backSideSeamReduction,backInseamReduction},points,front:{outline:frontOutline,side,fly,inseam:inseamCurve,dart:frontDartShape,sideLength:frontSideLength,inseamLength:frontInseamLength},back:{outline:backOutline,side:backSide,inseam:backInseam,crotch:backCrotch,waist:backWaist,sideLength:backSideLength,inseamLength:backInseamLength,sideReduction:frontSideLength-backSideLength,inseamReduction:frontInseamLength-backInseamLength},backGuide:{points:[points[25],points[26],points[27],points[28],points[29],points[30],points[31],points[32],points[33],points['33a'],points[34],points['34a'],points[35],points['35a'],points[36],points[37],points[38],points[39]],dart:backDartShape,lowerOffset:2,widthQuarter:backWidth/4,seatShapeOffset,gridLift:backGridLift},inseam,kneeFromSeat,frontWidth,backWidth,stepWidth,crease,hipY,kneeY,hemY,hemHalf,
+  return {values:{...v,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset,backLengthReduction,backTopShift,backDart,backDartLength,backWaistEase,backSideSeamReduction,backInseamReduction},points,front:{outline:frontOutline,side,fly,inseam:inseamCurve,dart:frontDartShape,sideLength:frontSideLength,inseamLength:frontInseamLength},back:{outline:backOutline,side:backSide,inseam:backInseam,crotch:backCrotch,waist:backWaist,dartClosure:backDartClosure,sideLength:backSideLength,inseamLength:backInseamLength,sideReduction:frontSideLength-backSideLength,inseamReduction:frontInseamLength-backInseamLength},backGuide:{points:[points[25],points[26],points[27],points[28],points[29],points[30],points[31],points[32],points[33],points['33a'],points[34],points['34a'],points[35],points['35a'],points[36],points[37],points[38],points[39]],dart:backDartShape,lowerOffset:2,widthQuarter:backWidth/4,seatShapeOffset,gridLift:backGridLift},inseam,kneeFromSeat,frontWidth,backWidth,stepWidth,crease,hipY,kneeY,hemY,hemHalf,
   source:'Ателье-2001, PDF19–22, печатные20–23, рис.1–6; задний контур инженерно уточнён по длинам швов, требует макета',cutReady:false};
  }
  function foundationArtwork(d){
@@ -146,12 +154,12 @@
  trouserPanels[2].append(host.querySelector('.form'));
  const error=document.createElement('p');error.id='trouser-error';error.setAttribute('role','alert');trouserPanels[2].append(error);
  action(trouserPanels[2],'← Выбрать изделие',1);action(trouserPanels[2],'Построить →',3,true);
- heading(trouserPanels[3],'Чертёж основы брюк','Передняя половинка и экспериментальный контур спинки по длинам швов. Без припусков; макет и посадка не проверены.');
+ heading(trouserPanels[3],'Чертёж основы брюк','Передняя половинка и экспериментальный контур спинки по длинам швов. Шаг 7 показан только как экранное складывание вытачки. Без припусков; линия после закрытия и посадка не проверены.');
  const guideSteps=document.createElement('div');
  guideSteps.className='guide-stages';
  guideSteps.setAttribute('role','group');
  guideSteps.setAttribute('aria-label','Этапы построения задней половинки');
- guideSteps.innerHTML='<button type="button" class="secondary" data-back-stage="1" aria-pressed="true">Шаг 1 · Опоры спинки 25–35</button><button type="button" class="secondary" data-back-stage="2" aria-pressed="false">Шаг 2 · Талия и вытачка 36–38</button><button type="button" class="secondary" data-back-stage="3" aria-pressed="false">Шаг 3 · Точка 39 и контур спинки</button>';
+ guideSteps.innerHTML='<button type="button" class="secondary" data-back-stage="1" aria-pressed="true">Шаг 1 · Опоры спинки 25–35</button><button type="button" class="secondary" data-back-stage="2" aria-pressed="false">Шаг 2 · Талия и вытачка 36–38</button><button type="button" class="secondary" data-back-stage="3" aria-pressed="false">Шаг 3 · Точка 39 и контур спинки</button><button type="button" class="secondary" data-back-stage="4" aria-pressed="false">Шаг 4 · Закрыть вытачку</button>';
  const guideCopy=document.createElement('p');
  guideCopy.className='muted';
  guideCopy.id='trouser-guide-copy';
@@ -166,11 +174,13 @@
    ?'Шаг 1. Сверьте верхнюю опору, линию бёдер и направляющие колена и низа. Выбранные линии задней половинки выделены оранжевым.'
    :backStage===2
     ?'Шаг 2. Проверьте отрезок 36–37, верхнюю линию 37–38 и вытачку. Точка 36 размещена на линии талии как цифровая интерпретация рисунка.'
-    :'Шаг 3. Точка 39 найдена на направляющей 30–31 по длине заднего шагового среза; контур спинки показан фиолетовым. Перпендикуляр из 38 остаётся условной экранной подсказкой.';
+    :backStage===3
+     ?'Шаг 3. Точка 39 найдена на направляющей 30–31 по длине заднего шагового среза; контур спинки показан фиолетовым. Перпендикуляр из 38 остаётся условной экранной подсказкой.'
+     :'Шаг 4. Зелёным показана линия талии после поворота одной стороны вытачки к другой вокруг вершины. Это экранная иллюстрация шага 7 и не заменяет уточнение линии на бумажной выкройке; контур печати остаётся с открытыми метками вытачки.';
   refresh();
  }));
  action(trouserPanels[3],'← Изменить мерки',2);action(trouserPanels[3],'Печать →',4,true);
- heading(trouserPanels[4],'Печать учебного чертежа брюк','PDF 1:1 содержит передний контур и экспериментальный контур спинки. Припусков нет, длины бокового и шагового швов согласованы расчётно, но контуры и посадка не проверены макетом. Не использовать для раскроя без проверки. Печатайте 100%, без подгонки; проверьте квадрат 100 × 100 мм.');
+ heading(trouserPanels[4],'Печать учебного чертежа брюк','PDF 1:1 содержит передний контур и экспериментальный контур спинки с несложенной вытачкой. Припусков нет; шаг 7 показан только в экранном просмотре. Линия талии после закрытия и посадка не проверены макетом. Не использовать для раскроя без проверки. Печатайте 100%, без подгонки; проверьте квадрат 100 × 100 мм.');
  trouserPanels[4].append(host.querySelector('#trouser-export'));
  const printStatus=document.createElement('p');printStatus.id='trouser-print-status';printStatus.setAttribute('role','status');trouserPanels[4].append(printStatus);
  action(trouserPanels[4],'← К чертежу',3);
@@ -183,7 +193,7 @@
    let stroke=.6,ink='#244d80';const drawn=art.cmd.map(c=>{if(c[0]==='W'){stroke=c[1];return '';}if(c[0]==='K'){ink='#'+c.slice(1).map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');return '';}if(c[0]==='L')return `<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" stroke="${ink}" fill="none" stroke-width="${stroke}"/>`;return '';}).join('');
    const backPairs=backStage===1
    ?[[11,25],[25,26],[26,27],[7,26],[28,29],[29,30],[32,29],[29,35],[30,31],[32,33],[31,34],[33,'33a'],[34,'34a']]
-   :backStage===2?[[35,36],[36,37],[37,38]]:[[37,39],[39,31],[31,34],['35a',29],[29,32],[32,33]];
+   :backStage===2?[[35,36],[36,37],[37,38]]:backStage===3?[[37,39],[39,31],[31,34],['35a',29],[29,32],[32,33]]:[];
   const px=n=>20+n*10,py=n=>25+n*10;
   const highlight=backPairs.map(([a,b])=>{const u=d.points[a],v=d.points[b];return `<path d="M${px(u.x)} ${py(u.y)}L${px(v.x)} ${py(v.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`;}).join('');
   const normalAxis={x:d.points[38].x-d.points[37].x,y:d.points[38].y-d.points[37].y};
@@ -192,8 +202,9 @@
   if(normal.y>0)normal={x:-normal.x,y:-normal.y};
   const normalEnd={x:d.points[38].x+normal.x*1.5,y:d.points[38].y+normal.y*1.5};
   const perpendicularCue=backStage===3?`<path d="M${px(d.points[38].x)} ${py(d.points[38].y)}L${px(normalEnd.x)} ${py(normalEnd.y)}" stroke="#d17b17" stroke-width="2.8" stroke-dasharray="5 3" fill="none"/><circle cx="${px(normalEnd.x)}" cy="${py(normalEnd.y)}" r="2.5" fill="#d17b17"/><text x="${px(normalEnd.x)+4}" y="${py(normalEnd.y)-4}" font-size="10" fill="#8a4e0b">перпендикуляр из 38 · условно</text>`:'';
+  const closedDartCue=backStage===4?`<path d="M${d.back.dartClosure.waist.map((p,i)=>`${i?'L':'M'}${px(p.x)} ${py(p.y)}`).join('')}" stroke="#169b62" stroke-width="3" fill="none"/><text x="${px(d.points[38].x)}" y="${py(d.points[38].y)+12}" font-size="10" fill="#147a4e">талия после складывания · учебный вид</text>`:'';
   const dart=backStage===2?`<path d="M${px(d.backGuide.dart.left.x)} ${py(d.backGuide.dart.left.y)}L${px(d.backGuide.dart.apex.x)} ${py(d.backGuide.dart.apex.y)}L${px(d.backGuide.dart.right.x)} ${py(d.backGuide.dart.right.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`:'';
-  preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж брюк, этап ${backStage} задней половинки">${drawn}${highlight}${dart}${perpendicularCue}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
+  preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж брюк, этап ${backStage} задней половинки">${drawn}${highlight}${dart}${perpendicularCue}${closedDartCue}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
   }catch(e){out.textContent=e.message;document.getElementById('trouser-error').textContent=e.message;preview.replaceChildren();}
  }
 
