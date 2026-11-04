@@ -24,6 +24,15 @@ assert(Math.abs((d.points[28].y-d.points[29].y)-(d.points[26].y-d.points[27].y))
 assert(Math.abs((d.points[30].x-d.points[25].x)-(d.points[25].x-d.points[29].x))<1e-10);
 assert.equal(d.points[30].y,d.hipY);
 assert.equal(d.points[35].y,0);
+assert.equal(d.points[36].y,0);
+assert(Math.abs(Math.hypot(d.points[13].x-d.points[36].x,d.points[13].y-d.points[36].y)-(Math.hypot(d.points[13].x-d.points[35].x,d.points[13].y-d.points[35].y)-d.values.backLengthReduction))<1e-9,'point36 follows the source length relation');
+assert(Math.abs(Math.hypot(d.points[36].x-d.points[37].x,d.points[36].y-d.points[37].y)-d.values.backTopShift)<1e-9,'point37 follows the 36–35 line');
+assert(Math.abs(Math.hypot(d.points[37].x-d.points[38].x,d.points[37].y-d.points[38].y)-(v.waist/4+d.values.backDart+d.values.backWaistEase))<1e-9,'back waist length follows the source relation');
+assert.equal(d.backGuide.dart.intake,d.values.backDart);
+assert.equal(d.backGuide.dart.length,d.values.backDartLength);
+const backAxis={x:d.points[36].x-d.points[35].x,y:d.points[36].y-d.points[35].y};
+const dartVector={x:d.backGuide.dart.apex.x-(d.backGuide.dart.left.x+d.backGuide.dart.right.x)/2,y:d.backGuide.dart.apex.y-(d.backGuide.dart.left.y+d.backGuide.dart.right.y)/2};
+assert(Math.abs(backAxis.x*dartVector.x+backAxis.y*dartVector.y)<1e-9,'back dart is perpendicular to line 36–35');
 const sideCross=(d.points[29].x-d.points[32].x)*(d.points[35].y-d.points[32].y)-(d.points[29].y-d.points[32].y)*(d.points[35].x-d.points[32].x);
 assert(Math.abs(sideCross)<1e-9,'point35 lies on line 32–29');
 assert.equal(d.points[31].x-d.points[19].x,2);
@@ -32,7 +41,7 @@ assert.equal(d.points[15].x-d.points[33].x,2);
 assert.equal(d.points[34].x-d.points[16].x,2);
 assert.equal(d.points['33a'].y,d.points[33].y-d.values.hemTurn);
 assert.equal(d.points['34a'].y,d.points[34].y-d.values.hemTurn);
-assert.match(d.source,/PDF19–21/);
+assert.match(d.source,/PDF19–22/);
 assert.deepEqual(d.front.outline[0],d.front.outline.at(-1),'front contour closes');
 assert(d.front.outline.length>40,'front contour uses interpolated construction points');
 for(const hip of [90,100,120]){
@@ -45,5 +54,6 @@ for(const hip of [90,100,120]){
  assert(pdf.includes('CONTROL 100 x 100 mm'));
  assert(tiles.at(-1).x+190>=art.width&&tiles.at(-1).y+277>=art.height);
 }
-for(const override of [{seatHeight:0},{hip:60},{sideLength:20},{shortening:100},{backEase:2},{hemTurn:9},{stepExtra:0},{hemCircumference:Infinity},{frontDart:1},{frontDartLength:11},{frontWaistEase:1},{backShift:2.1},{seatShapeOffset:5.1}])assert.throws(()=>T.build({...v,...override}));
-console.log('Trouser front: source controls, contour, dart, scaled PDF and invalid inputs OK');
+for(const override of [{seatHeight:0},{hip:60},{sideLength:20},{shortening:100},{backEase:2},{hemTurn:9},{stepExtra:0},{hemCircumference:Infinity},{frontDart:1},{frontDartLength:11},{frontWaistEase:1},{backShift:2.1},{seatShapeOffset:5.1},{backLengthReduction:1.1},{backTopShift:1.1},{backDart:2.9},{backDartLength:15.1},{backWaistEase:.6}])assert.throws(()=>T.build({...v,...override}));
+console.log('Trouser construction: source checks, front contour, back waist and dart, scaled PDF and invalid inputs OK');
+
