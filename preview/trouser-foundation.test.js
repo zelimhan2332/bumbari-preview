@@ -30,6 +30,10 @@ const crotchLine={x:d.points[31].x-d.points[30].x,y:d.points[31].y-d.points[30].
 assert(Math.abs(crotchLine.x*crotchTo39.y-crotchLine.y*crotchTo39.x)<1e-9,'point39 lies on guide 30–31');
 assert(Math.abs(d.back.sideLength-(d.front.sideLength-d.values.backSideSeamReduction))<1e-8,'back side seam is shortened as selected');
 assert(Math.abs(d.back.inseamLength-(d.front.inseamLength-d.values.backInseamReduction))<1e-8,'back inseam is shortened as selected');
+assert(d.back.dartClosure.waist.length>8,'closed dart waist guide is sampled');
+const dr={x:d.backGuide.dart.right.x-d.backGuide.dart.apex.x,y:d.backGuide.dart.right.y-d.backGuide.dart.apex.y};
+const closedRight={x:d.backGuide.dart.apex.x+dr.x*Math.cos(d.back.dartClosure.angle)-dr.y*Math.sin(d.back.dartClosure.angle),y:d.backGuide.dart.apex.y+dr.x*Math.sin(d.back.dartClosure.angle)+dr.y*Math.cos(d.back.dartClosure.angle)};
+assert(Math.hypot(closedRight.x-d.backGuide.dart.left.x,closedRight.y-d.backGuide.dart.left.y)<1e-9,'dart sides meet in the closed-dart guide');
 assert.deepEqual(d.back.outline[0],d.back.outline.at(-1),'experimental back outline closes');
 assert(d.back.outline.length>60,'back outline includes interpolated seam curves');
 assert(Math.abs(Math.hypot(d.points[13].x-d.points[36].x,d.points[13].y-d.points[36].y)-(Math.hypot(d.points[13].x-d.points[35].x,d.points[13].y-d.points[35].y)-d.values.backLengthReduction))<1e-9,'point36 follows the source length relation');
@@ -55,6 +59,9 @@ for(const hip of [90,100,120]){
  const g=T.build({...v,hip}),art=T.artwork(g),tiles=P.pages(art,'a4');
  assert(Math.abs(g.frontWidth+g.backWidth-hip/2)<1e-9);
  assert(Math.abs(g.points[11].x*2-(g.frontWidth+g.stepWidth))<1e-9);
+ assert(Math.abs(g.back.sideLength-(g.front.sideLength-g.values.backSideSeamReduction))<1e-8);
+ assert(Math.abs(g.back.inseamLength-(g.front.inseamLength-g.values.backInseamReduction))<1e-8);
+ assert.deepEqual(g.back.outline[0],g.back.outline.at(-1));
  const pdf=Buffer.from(P.pdf(art,tiles)).toString();assert(pdf.includes('BACK OUTLINE EXPERIMENTAL / NOT CUT READY'));
  assert(pdf.includes('0.5800 0.6800 0.8200 RG'),'PDF distinguishes construction guides from contours');
  assert(pdf.includes('0.7200 0.2500 0.4500 RG'),'PDF distinguishes the experimental back outline');
@@ -63,5 +70,5 @@ for(const hip of [90,100,120]){
  assert(tiles.at(-1).x+190>=art.width&&tiles.at(-1).y+277>=art.height);
 }
 for(const override of [{seatHeight:0},{hip:60},{sideLength:20},{shortening:100},{backEase:2},{hemTurn:9},{stepExtra:0},{hemCircumference:Infinity},{frontDart:1},{frontDartLength:11},{frontWaistEase:1},{backShift:2.1},{seatShapeOffset:5.1},{backLengthReduction:1.1},{backTopShift:1.1},{backDart:2.9},{backDartLength:15.1},{backWaistEase:.6},{backSideSeamReduction:.6},{backInseamReduction:-.1}])assert.throws(()=>T.build({...v,...override}));
-console.log('Trouser construction: source checks, front and experimental back contours, seam lengths, scaled PDF and invalid inputs OK');
+console.log('Trouser construction: front/back outlines, both seam lengths, dart-fold guide, scaled PDF and invalid inputs OK');
 
