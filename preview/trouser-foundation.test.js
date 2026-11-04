@@ -25,6 +25,13 @@ assert(Math.abs((d.points[30].x-d.points[25].x)-(d.points[25].x-d.points[29].x))
 assert.equal(d.points[30].y,d.hipY);
 assert.equal(d.points[35].y,0);
 assert.equal(d.points[36].y,0);
+assert(Number.isFinite(d.points['35a'].y));
+const crotchLine={x:d.points[31].x-d.points[30].x,y:d.points[31].y-d.points[30].y},crotchTo39={x:d.points[39].x-d.points[30].x,y:d.points[39].y-d.points[30].y};
+assert(Math.abs(crotchLine.x*crotchTo39.y-crotchLine.y*crotchTo39.x)<1e-9,'point39 lies on guide 30–31');
+assert(Math.abs(d.back.sideLength-(d.front.sideLength-d.values.backSideSeamReduction))<1e-8,'back side seam is shortened as selected');
+assert(Math.abs(d.back.inseamLength-(d.front.inseamLength-d.values.backInseamReduction))<1e-8,'back inseam is shortened as selected');
+assert.deepEqual(d.back.outline[0],d.back.outline.at(-1),'experimental back outline closes');
+assert(d.back.outline.length>60,'back outline includes interpolated seam curves');
 assert(Math.abs(Math.hypot(d.points[13].x-d.points[36].x,d.points[13].y-d.points[36].y)-(Math.hypot(d.points[13].x-d.points[35].x,d.points[13].y-d.points[35].y)-d.values.backLengthReduction))<1e-9,'point36 follows the source length relation');
 assert(Math.abs(Math.hypot(d.points[36].x-d.points[37].x,d.points[36].y-d.points[37].y)-d.values.backTopShift)<1e-9,'point37 follows the 36–35 line');
 assert(Math.abs(Math.hypot(d.points[37].x-d.points[38].x,d.points[37].y-d.points[38].y)-(v.waist/4+d.values.backDart+d.values.backWaistEase))<1e-9,'back waist length follows the source relation');
@@ -48,12 +55,13 @@ for(const hip of [90,100,120]){
  const g=T.build({...v,hip}),art=T.artwork(g),tiles=P.pages(art,'a4');
  assert(Math.abs(g.frontWidth+g.backWidth-hip/2)<1e-9);
  assert(Math.abs(g.points[11].x*2-(g.frontWidth+g.stepWidth))<1e-9);
- const pdf=Buffer.from(P.pdf(art,tiles)).toString();assert(pdf.includes('BACK GRID GUIDES ONLY'));
- assert(pdf.includes('0.5800 0.6800 0.8200 RG'),'PDF distinguishes construction guides from the cut contour');
+ const pdf=Buffer.from(P.pdf(art,tiles)).toString();assert(pdf.includes('BACK OUTLINE EXPERIMENTAL / NOT CUT READY'));
+ assert(pdf.includes('0.5800 0.6800 0.8200 RG'),'PDF distinguishes construction guides from contours');
+ assert(pdf.includes('0.7200 0.2500 0.4500 RG'),'PDF distinguishes the experimental back outline');
  assert(pdf.includes('3.9685 w'),'PDF preserves 1.4 mm cut contour width');
  assert(pdf.includes('CONTROL 100 x 100 mm'));
  assert(tiles.at(-1).x+190>=art.width&&tiles.at(-1).y+277>=art.height);
 }
-for(const override of [{seatHeight:0},{hip:60},{sideLength:20},{shortening:100},{backEase:2},{hemTurn:9},{stepExtra:0},{hemCircumference:Infinity},{frontDart:1},{frontDartLength:11},{frontWaistEase:1},{backShift:2.1},{seatShapeOffset:5.1},{backLengthReduction:1.1},{backTopShift:1.1},{backDart:2.9},{backDartLength:15.1},{backWaistEase:.6}])assert.throws(()=>T.build({...v,...override}));
-console.log('Trouser construction: source checks, front contour, back waist and dart, scaled PDF and invalid inputs OK');
+for(const override of [{seatHeight:0},{hip:60},{sideLength:20},{shortening:100},{backEase:2},{hemTurn:9},{stepExtra:0},{hemCircumference:Infinity},{frontDart:1},{frontDartLength:11},{frontWaistEase:1},{backShift:2.1},{seatShapeOffset:5.1},{backLengthReduction:1.1},{backTopShift:1.1},{backDart:2.9},{backDartLength:15.1},{backWaistEase:.6},{backSideSeamReduction:.6},{backInseamReduction:-.1}])assert.throws(()=>T.build({...v,...override}));
+console.log('Trouser construction: source checks, front and experimental back contours, seam lengths, scaled PDF and invalid inputs OK');
 
