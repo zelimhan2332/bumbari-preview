@@ -1,0 +1,54 @@
+name: Android release
+on:
+  push:
+    tags: ['android-v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Подготовить защищённую подпись
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/bumbari-release.jks
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64" || { echo 'Не задан секрет ANDROID_KEYSTORE_BASE64'; exit 1; }
+          test -n "$ANDROID_KEYSTORE_PASSWORD" || { echo 'Не задан секрет ANDROID_KEYSTORE_PASSWORD'; exit 1; }
+          test -n "$ANDROID_KEY_ALIAS" || { echo 'Не задан секрет ANDROID_KEY_ALIAS'; exit 1; }
+          test -n "$ANDROID_KEY_PASSWORD" || { echo 'Не задан секрет ANDROID_KEY_PASSWORD'; exit 1; }
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE_PATH"
+      - name: Собрать APK и выполнить проверки
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/bumbari-release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          VERSION_NAME="${GITHUB_REF_NAME#android-v}"
+          VERSION_CODE=$((1000 + GITHUB_RUN_NUMBER))
+          gradle -p android assembleRelease testDebugUnitTest --no-daemon \
+            -PandroidVersionCode="$VERSION_CODE" -PandroidVersionName="$VERSION_NAME"
+          cp android/app/build/outputs/apk/release/app-release.apk bumbari-android-release.apk
+          SHA256=$(sha256sum bumbari-android-release.apk | cut -d ' ' -f 1)
+          export VERSION_NAME VERSION_CODE SHA256
+          python3 -c 'import json,os; print(json.dumps({"versionCode":int(os.environ["VERSION_CODE"]),"versionName":os.environ["VERSION_NAME"],"packageName":"ru.bumbari.patterns","apkUrl":"https://github.com/zelimhan2332/bumbari-preview/releases/download/"+os.environ["GITHUB_REF_NAME"]+"/bumbari-android-release.apk","sha256":os.environ["SHA256"]},ensure_ascii=False,indent=2))' > update.json
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" bumbari-android-release.apk update.json --title "Bumbari Android ${GITHUB_REF_NAME#android-v}" --notes "Обновление Android-приложения Bumbari."
