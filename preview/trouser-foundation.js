@@ -1,13 +1,13 @@
 /* Standard trousers, Atelier 2001 PDF19–22 / printed20–23, figures1–6.
    Visually reviewed. cm; y increases downward from waist.
-   Front contour plus incomplete back construction guides; spline interpolation is not a book formula. */
+   Experimental back contour uses seam-length trueing; all spline curves are digital approximations. */
 (function(root){
  function buildTrouserFoundation(v){
-  const {hip,waist,sideLength,seatHeight,hemCircumference,shortening=3.5,backEase=0,stepExtra=1,hemInset=1,hemTurn=6,frontDart=2,frontDartLength=9.5,frontWaistEase=.25,backShift=1.5,seatShapeOffset=4,backLengthReduction=.5,backTopShift=.75,backDart=3.5,backDartLength=14,backWaistEase=.25}=v;
-  for(const [key,n] of Object.entries({hip,waist,sideLength,seatHeight,hemCircumference,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset,backLengthReduction,backTopShift,backDart,backDartLength,backWaistEase}))if(!Number.isFinite(n))throw Error('Введите число: '+key);
+  const {hip,waist,sideLength,seatHeight,hemCircumference,shortening=3.5,backEase=0,stepExtra=1,hemInset=1,hemTurn=6,frontDart=2,frontDartLength=9.5,frontWaistEase=.25,backShift=1.5,seatShapeOffset=4,backLengthReduction=.5,backTopShift=.75,backDart=3.5,backDartLength=14,backWaistEase=.25,backSideSeamReduction=.25,backInseamReduction=.25}=v;
+  for(const [key,n] of Object.entries({hip,waist,sideLength,seatHeight,hemCircumference,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset,backLengthReduction,backTopShift,backDart,backDartLength,backWaistEase,backSideSeamReduction,backInseamReduction}))if(!Number.isFinite(n))throw Error('Введите число: '+key);
   if(hip<=waist||waist<=0||sideLength<=seatHeight||seatHeight<=0||hemCircumference<=0)throw Error('Проверьте обхваты, боковую длину и высоту сидения.');
   if(shortening<0||shortening>=sideLength-seatHeight)throw Error('Укорочение должно оставлять низ ниже линии сидения.');
-  if(backEase<0||backEase>1||stepExtra<.5||stepExtra>1||hemInset<0||hemInset>1||hemTurn<4||hemTurn>8||frontDart<1.5||frontDart>2.5||frontDartLength<9||frontDartLength>10||frontWaistEase<0||frontWaistEase>.5||backShift<1||backShift>2||seatShapeOffset<3||seatShapeOffset>5||backLengthReduction<0||backLengthReduction>1||backTopShift<.5||backTopShift>1||backDart<3||backDart>4||backDartLength<13||backDartLength>15||backWaistEase<0||backWaistEase>.5)throw Error('Параметры выходят за диапазоны выбранной инструкции.');
+  if(backEase<0||backEase>1||stepExtra<.5||stepExtra>1||hemInset<0||hemInset>1||hemTurn<4||hemTurn>8||frontDart<1.5||frontDart>2.5||frontDartLength<9||frontDartLength>10||frontWaistEase<0||frontWaistEase>.5||backShift<1||backShift>2||seatShapeOffset<3||seatShapeOffset>5||backLengthReduction<0||backLengthReduction>1||backTopShift<.5||backTopShift>1||backDart<3||backDart>4||backDartLength<13||backDartLength>15||backWaistEase<0||backWaistEase>.5||backSideSeamReduction<0||backSideSeamReduction>.5||backInseamReduction<0||backInseamReduction>.5)throw Error('Параметры выходят за диапазоны выбранной инструкции.');
   const inseam=sideLength-seatHeight,kneeFromSeat=inseam*.4;
   const frontWidth=hip/4-1,backWidth=hip/4+1+backEase,stepWidth=hip/20+stepExtra;
   const hipY=seatHeight-(hip/20+3),kneeY=seatHeight+kneeFromSeat,hemY=sideLength-shortening;
@@ -73,14 +73,39 @@
   const fly=through([points[20],points['8c'],points['8b'],points[17]]);
   const inseamCurve=through([points[17],points[24],points['16a'],points[16]]);
   const frontOutline=[...side,points[16],...inseamCurve.slice(0,-1).reverse(),...fly.slice(0,-1).reverse(),points[14],points[22]];
-  return {values:{...v,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset,backLengthReduction,backTopShift,backDart,backDartLength,backWaistEase},points,front:{outline:frontOutline,side,fly,inseam:inseamCurve,dart:frontDartShape},backGuide:{points:[points[25],points[26],points[27],points[28],points[29],points[30],points[31],points[32],points[33],points['33a'],points[34],points['34a'],points[35],points[36],points[37],points[38]],dart:backDartShape,lowerOffset:2,widthQuarter:backWidth/4,seatShapeOffset,gridLift:backGridLift},inseam,kneeFromSeat,frontWidth,backWidth,stepWidth,crease,hipY,kneeY,hemY,hemHalf,
-  source:'Ателье-2001, PDF19–22, печатные20–23, рис.1–6; построение задней половинки неполное',cutReady:false};
+  const curveLength=curve=>curve.slice(1).reduce((sum,q,i)=>sum+dist(curve[i],q),0);
+  const frontSideLength=curveLength(side),frontInseamLength=curveLength(inseamCurve);
+  // Step 7 trueing: adjust a digital waist endpoint so the back side seam
+  // is 0–0.5 cm shorter than the front side seam.
+  const backSideTarget=frontSideLength-backSideSeamReduction;
+  const sideAt=y=>{const start={x:points[35].x,y};return curveLength(through([start,points[29],points[32],points[33]]));};
+  let sideLow=-5,sideHigh=5;
+  if(sideAt(sideLow)<backSideTarget||sideAt(sideHigh)>backSideTarget)throw Error('Не удаётся согласовать длину бокового среза задней половинки в выбранном диапазоне.');
+  for(let i=0;i<48;i++){const mid=(sideLow+sideHigh)/2;if(sideAt(mid)>backSideTarget)sideLow=mid;else sideHigh=mid;}
+  points['35a']={x:points[35].x,y:(sideLow+sideHigh)/2};
+  const backSide=through([points['35a'],points[29],points[32],points[33]]);
+  // Figure 6 places 39 on guide 30–31; solve its position by the source
+  // inseam-length relation and the selected 0–0.5 cm reduction.
+  const backInseamTarget=frontInseamLength-backInseamReduction;
+  const point39At=t=>({x:points[30].x+(points[31].x-points[30].x)*t,y:points[30].y+(points[31].y-points[30].y)*t});
+  const inseamAt=t=>curveLength(through([point39At(t),points[31],points[34]]));
+  if(backInseamTarget>inseamAt(0)||backInseamTarget<inseamAt(1))throw Error('Нельзя согласовать задний шаговый срез с передним в диапазоне шага 6.');
+  let inseamLow=0,inseamHigh=1;
+  for(let i=0;i<48;i++){const mid=(inseamLow+inseamHigh)/2;if(inseamAt(mid)>backInseamTarget)inseamLow=mid;else inseamHigh=mid;}
+  points[39]=point39At((inseamLow+inseamHigh)/2);
+  const backInseam=through([points[39],points[31],points[34]]);
+  const backCrotch=through([points[37],points[28],points[39]]);
+  const backWaist=through([points['35a'],points[38],points[37]]);
+  const backOutline=[...backWaist,...backCrotch.slice(1),...backInseam.slice(1),points[33],...backSide.slice(0,-1).reverse()];
+  const backSideLength=curveLength(backSide),backInseamLength=curveLength(backInseam);
+  return {values:{...v,shortening,backEase,stepExtra,hemInset,hemTurn,frontDart,frontDartLength,frontWaistEase,backShift,seatShapeOffset,backLengthReduction,backTopShift,backDart,backDartLength,backWaistEase,backSideSeamReduction,backInseamReduction},points,front:{outline:frontOutline,side,fly,inseam:inseamCurve,dart:frontDartShape,sideLength:frontSideLength,inseamLength:frontInseamLength},back:{outline:backOutline,side:backSide,inseam:backInseam,crotch:backCrotch,waist:backWaist,sideLength:backSideLength,inseamLength:backInseamLength,sideReduction:frontSideLength-backSideLength,inseamReduction:frontInseamLength-backInseamLength},backGuide:{points:[points[25],points[26],points[27],points[28],points[29],points[30],points[31],points[32],points[33],points['33a'],points[34],points['34a'],points[35],points['35a'],points[36],points[37],points[38],points[39]],dart:backDartShape,lowerOffset:2,widthQuarter:backWidth/4,seatShapeOffset,gridLift:backGridLift},inseam,kneeFromSeat,frontWidth,backWidth,stepWidth,crease,hipY,kneeY,hemY,hemHalf,
+  source:'Ателье-2001, PDF19–22, печатные20–23, рис.1–6; задний контур инженерно уточнён по длинам швов, требует макета',cutReady:false};
  }
  function foundationArtwork(d){
   const cmd=[],p=d.points,x=n=>20+n*10,y=n=>25+n*10;
   const line=(a,b)=>cmd.push(['L',x(a.x),y(a.y),x(b.x),y(b.y)]);
-  cmd.push(['T',15,10,'BUMBARI / TROUSER FRONT HALF / 1:1 / NO SEAM ALLOWANCES']);
-  cmd.push(['T',15,17,'FRONT CONTOUR / BACK GRID GUIDES ONLY / NOT A COMPLETE PAIR']);
+  cmd.push(['T',15,10,'BUMBARI / TROUSER STUDY / 1:1 / NO SEAM ALLOWANCES']);
+  cmd.push(['T',15,17,'FRONT CONTOUR / BACK OUTLINE EXPERIMENTAL / NOT CUT READY']);
   for(const level of [0,d.hipY,d.values.seatHeight,d.kneeY,d.hemY])line({x:0,y:level},{x:d.frontWidth+d.stepWidth+3,y:level});
   for(const xx of [0,d.frontWidth,d.crease])line({x:xx,y:0},{x:xx,y:d.hemY});
   for(const [a,b] of [[7,'15a'],[9,'16a'],[15,'15a'],[16,'16a']])line(p[a],p[b]);
@@ -94,6 +119,7 @@
   line(p[20],p['8c']);line(p['8b'],p[17]);
   line(d.front.dart.left,d.front.dart.apex);line(d.front.dart.right,d.front.dart.apex);
   cmd.push(['W',1.4]);for(let i=0;i<d.front.outline.length-1;i++)line(d.front.outline[i],d.front.outline[i+1]);cmd.push(['W',.6]);
+  cmd.push(['K',.72,.25,.45]);cmd.push(['W',1]);for(let i=0;i<d.back.outline.length-1;i++)line(d.back.outline[i],d.back.outline[i+1]);cmd.push(['W',.6]);cmd.push(['K',0,0,0]);
   for(const [name,point] of Object.entries(p))cmd.push(['T',x(point.x)+1,y(point.y)-1,name]);
   const sx=x(d.frontWidth+d.stepWidth+5),sy=40;
   for(const [a,b,c,e] of [[sx,sy,sx+100,sy],[sx+100,sy,sx+100,sy+100],[sx+100,sy+100,sx,sy+100],[sx,sy+100,sx,sy]])cmd.push(['L',a,b,c,e]);
@@ -103,8 +129,8 @@
  root.TrouserFoundation={build:buildTrouserFoundation,artwork:foundationArtwork};
  if(typeof module!=='undefined'){module.exports=root.TrouserFoundation;return;}
  const host=document.createElement('section');host.className='panel';host.style.marginTop='22px';
- const fields=[['waist','Талия',76],['hip','Бёдра',100],['sideLength','Длина сбоку до пола',106],['seatHeight','Высота сидения',26.5],['hemCircumference','Полный обхват низа одной штанины',42],['shortening','Укорочение от пола',3.5],['frontDart','Раствор передней вытачки',2],['frontDartLength','Длина передней вытачки',9.5],['backShift','Сдвиг задней части, шаг 4',1.5],['seatShapeOffset','Отступ по форме ягодиц: выпуклые 3, плоские 5',4],['backLengthReduction','Уменьшение длины 13–36, шаг 6',.5],['backTopShift','Сдвиг 36–37, шаг 6',.75],['backDart','Раствор вытачки спинки',3.5],['backDartLength','Длина вытачки спинки',14],['backWaistEase','Прибавка 37–38 на посадку',.25]];
- host.innerHTML='<div class="form">'+fields.map(([key,label,value])=>`<div class="field"><label for="trouser-${key}">${label}</label><div class="wrap"><input id="trouser-${key}" inputmode="decimal" value="${value}"><em>см</em></div></div>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать переднюю половинку 1:1</button>';
+ const fields=[['waist','Талия',76],['hip','Бёдра',100],['sideLength','Длина сбоку до пола',106],['seatHeight','Высота сидения',26.5],['hemCircumference','Полный обхват низа одной штанины',42],['shortening','Укорочение от пола',3.5],['frontDart','Раствор передней вытачки',2],['frontDartLength','Длина передней вытачки',9.5],['backShift','Сдвиг задней части, шаг 4',1.5],['seatShapeOffset','Отступ по форме ягодиц: выпуклые 3, плоские 5',4],['backLengthReduction','Уменьшение длины 13–36, шаг 6',.5],['backTopShift','Сдвиг 36–37, шаг 6',.75],['backDart','Раствор вытачки спинки',3.5],['backDartLength','Длина вытачки спинки',14],['backWaistEase','Прибавка 37–38 на посадку',.25],['backSideSeamReduction','Укорочение бокового шва спинки, 0–0,5',.25],['backInseamReduction','Укорочение шагового шва спинки, 0–0,5',.25]];
+ host.innerHTML='<div class="form">'+fields.map(([key,label,value])=>`<div class="field"><label for="trouser-${key}">${label}</label><div class="wrap"><input id="trouser-${key}" inputmode="decimal" value="${value}"><em>см</em></div></div>`).join('')+'</div><p id="trouser-result" aria-live="polite"></p><div id="trouser-preview"></div><button id="trouser-export" class="secondary">Скачать учебный чертёж переда и спинки 1:1</button>';
 
  // Keep existing skirt controls and their listeners together; use the same four steps.
  const skirtPanels={},trouserPanels={};
@@ -120,12 +146,12 @@
  trouserPanels[2].append(host.querySelector('.form'));
  const error=document.createElement('p');error.id='trouser-error';error.setAttribute('role','alert');trouserPanels[2].append(error);
  action(trouserPanels[2],'← Выбрать изделие',1);action(trouserPanels[2],'Построить →',3,true);
- heading(trouserPanels[3],'Чертёж основы брюк','Передняя половинка и направляющие спинки. Это неполный комплект, без припусков; посадка не проверена.');
+ heading(trouserPanels[3],'Чертёж основы брюк','Передняя половинка и экспериментальный контур спинки по длинам швов. Без припусков; макет и посадка не проверены.');
  const guideSteps=document.createElement('div');
  guideSteps.className='guide-stages';
  guideSteps.setAttribute('role','group');
  guideSteps.setAttribute('aria-label','Этапы построения задней половинки');
- guideSteps.innerHTML='<button type="button" class="secondary" data-back-stage="1" aria-pressed="true">Шаг 1 · Опоры спинки 25–35</button><button type="button" class="secondary" data-back-stage="2" aria-pressed="false">Шаг 2 · Талия и вытачка 36–38</button><button type="button" class="secondary" data-back-stage="3" aria-pressed="false">Шаг 3 · Перпендикуляр из 38</button>';
+ guideSteps.innerHTML='<button type="button" class="secondary" data-back-stage="1" aria-pressed="true">Шаг 1 · Опоры спинки 25–35</button><button type="button" class="secondary" data-back-stage="2" aria-pressed="false">Шаг 2 · Талия и вытачка 36–38</button><button type="button" class="secondary" data-back-stage="3" aria-pressed="false">Шаг 3 · Точка 39 и контур спинки</button>';
  const guideCopy=document.createElement('p');
  guideCopy.className='muted';
  guideCopy.id='trouser-guide-copy';
@@ -140,11 +166,11 @@
    ?'Шаг 1. Сверьте верхнюю опору, линию бёдер и направляющие колена и низа. Выбранные линии задней половинки выделены оранжевым.'
    :backStage===2
     ?'Шаг 2. Проверьте отрезок 36–37, верхнюю линию 37–38 и вытачку. Точка 36 размещена на линии талии как цифровая интерпретация рисунка.'
-    :'Шаг 3. От точки 38 показано направление перпендикуляра к 37–38. Длина стрелки условная (1,5 см на экране), точка 39 не рассчитывается и в лекало/PDF не входит.';
+    :'Шаг 3. Точка 39 найдена на направляющей 30–31 по длине заднего шагового среза; контур спинки показан фиолетовым. Перпендикуляр из 38 остаётся условной экранной подсказкой.';
   refresh();
  }));
  action(trouserPanels[3],'← Изменить мерки',2);action(trouserPanels[3],'Печать →',4,true);
- heading(trouserPanels[4],'Печать передней половинки брюк','Учебный PDF 1:1 на A4. Содержит переднюю деталь и вспомогательные линии спинки. Задней детали и припусков нет — для раскроя полного изделия не подходит. Печатайте 100%, без подгонки; проверьте квадрат 100 × 100 мм.');
+ heading(trouserPanels[4],'Печать учебного чертежа брюк','PDF 1:1 содержит передний контур и экспериментальный контур спинки. Припусков нет, длины бокового и шагового швов согласованы расчётно, но контуры и посадка не проверены макетом. Не использовать для раскроя без проверки. Печатайте 100%, без подгонки; проверьте квадрат 100 × 100 мм.');
  trouserPanels[4].append(host.querySelector('#trouser-export'));
  const printStatus=document.createElement('p');printStatus.id='trouser-print-status';printStatus.setAttribute('role','status');trouserPanels[4].append(printStatus);
  action(trouserPanels[4],'← К чертежу',3);
@@ -153,11 +179,11 @@
  function refresh(){
   const out=document.getElementById('trouser-result'),preview=document.getElementById('trouser-preview');
   try{document.getElementById('trouser-error').textContent='';const d=buildTrouserFoundation(values()),art=foundationArtwork(d),f=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
-   out.textContent=`Длина шага: ${f(d.inseam)}; от сидения до колена: ${f(d.kneeFromSeat)}; ширина передней сетки: ${f(d.frontWidth)}; ширина шага переда: ${f(d.stepWidth)}; линия бёдер от талии: ${f(d.hipY)} см.`;
+   out.textContent=`Длина шага: ${f(d.inseam)}; от сидения до колена: ${f(d.kneeFromSeat)}; ширина передней сетки: ${f(d.frontWidth)}; ширина шага переда: ${f(d.stepWidth)}; линия бёдер от талии: ${f(d.hipY)} см. Боковой шов перед/спинка: ${f(d.front.sideLength)}/${f(d.back.sideLength)} см; шаговый: ${f(d.front.inseamLength)}/${f(d.back.inseamLength)} см.`;
    let stroke=.6,ink='#244d80';const drawn=art.cmd.map(c=>{if(c[0]==='W'){stroke=c[1];return '';}if(c[0]==='K'){ink='#'+c.slice(1).map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');return '';}if(c[0]==='L')return `<path d="M${c[1]} ${c[2]}L${c[3]} ${c[4]}" stroke="${ink}" fill="none" stroke-width="${stroke}"/>`;return '';}).join('');
    const backPairs=backStage===1
    ?[[11,25],[25,26],[26,27],[7,26],[28,29],[29,30],[32,29],[29,35],[30,31],[32,33],[31,34],[33,'33a'],[34,'34a']]
-   :backStage===2?[[35,36],[36,37],[37,38]]:[];
+   :backStage===2?[[35,36],[36,37],[37,38]]:[[37,39],[39,31],[31,34],['35a',29],[29,32],[32,33]];
   const px=n=>20+n*10,py=n=>25+n*10;
   const highlight=backPairs.map(([a,b])=>{const u=d.points[a],v=d.points[b];return `<path d="M${px(u.x)} ${py(u.y)}L${px(v.x)} ${py(v.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`;}).join('');
   const normalAxis={x:d.points[38].x-d.points[37].x,y:d.points[38].y-d.points[37].y};
@@ -165,14 +191,14 @@
   let normal={x:normalAxis.y/normalLength,y:-normalAxis.x/normalLength};
   if(normal.y>0)normal={x:-normal.x,y:-normal.y};
   const normalEnd={x:d.points[38].x+normal.x*1.5,y:d.points[38].y+normal.y*1.5};
-  const perpendicularCue=backStage===3?`<path d="M${px(d.points[38].x)} ${py(d.points[38].y)}L${px(normalEnd.x)} ${py(normalEnd.y)}" stroke="#d17b17" stroke-width="2.8" stroke-dasharray="5 3" fill="none"/><circle cx="${px(normalEnd.x)}" cy="${py(normalEnd.y)}" r="2.5" fill="#d17b17"/><text x="${px(normalEnd.x)+4}" y="${py(normalEnd.y)-4}" font-size="10" fill="#8a4e0b">направление 39 · условно</text>`:'';
+  const perpendicularCue=backStage===3?`<path d="M${px(d.points[38].x)} ${py(d.points[38].y)}L${px(normalEnd.x)} ${py(normalEnd.y)}" stroke="#d17b17" stroke-width="2.8" stroke-dasharray="5 3" fill="none"/><circle cx="${px(normalEnd.x)}" cy="${py(normalEnd.y)}" r="2.5" fill="#d17b17"/><text x="${px(normalEnd.x)+4}" y="${py(normalEnd.y)-4}" font-size="10" fill="#8a4e0b">перпендикуляр из 38 · условно</text>`:'';
   const dart=backStage===2?`<path d="M${px(d.backGuide.dart.left.x)} ${py(d.backGuide.dart.left.y)}L${px(d.backGuide.dart.apex.x)} ${py(d.backGuide.dart.apex.y)}L${px(d.backGuide.dart.right.x)} ${py(d.backGuide.dart.right.y)}" stroke="#d17b17" stroke-width="2.8" fill="none"/>`:'';
   preview.innerHTML=`<svg viewBox="0 0 ${art.width} ${art.height}" style="height:520px;max-width:100%" role="img" aria-label="Чертёж брюк, этап ${backStage} задней половинки">${drawn}${highlight}${dart}${perpendicularCue}${Object.entries(d.points).map(([name,p])=>`<text x="${21+p.x*10}" y="${24+p.y*10}" font-size="10" fill="#203a60">${name}</text>`).join('')}</svg>`;
   }catch(e){out.textContent=e.message;document.getElementById('trouser-error').textContent=e.message;preview.replaceChildren();}
  }
 
  root.getTrouserMeasurements=values;
- root.setTrouserMeasurements=data=>{buildTrouserFoundation(data);for(const [key] of fields)document.getElementById('trouser-'+key).value=data[key];refresh();};
+ root.setTrouserMeasurements=data=>{buildTrouserFoundation(data);for(const [key,,fallback] of fields)document.getElementById('trouser-'+key).value=Number.isFinite(data[key])?data[key]:fallback;refresh();};
  const persist=()=>localStorage.setItem('bumbari-trouser-measures-v1',JSON.stringify(values()));
  trouserPanels[2].addEventListener('input',()=>{refresh();persist();});
  for(const input of trouserPanels[2].querySelectorAll('input')){input.type='text';input.inputMode='decimal';}
@@ -188,7 +214,7 @@
 
  document.getElementById('trouser-export').onclick=()=>{
   try{const art=foundationArtwork(buildTrouserFoundation(values())),P=root.MuellerPattern,bytes=P.pdf(art,P.pages(art,'a4')),url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
-   const a=document.createElement('a');a.href=url;a.download='bumbari-trouser-front-half.pdf';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);document.getElementById('trouser-print-status').textContent='PDF передней половинки подготовлен. Печатайте 100%; проверьте квадрат 100 × 100 мм. Комплект неполный, без припусков.';
+   const a=document.createElement('a');a.href=url;a.download='bumbari-trouser-front-half.pdf';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);document.getElementById('trouser-print-status').textContent='Учебный PDF подготовлен: передний и задний контуры, без припусков. Печатайте 100%; проверьте квадрат 100 × 100 мм. Задний контур экспериментальный и не подтверждён макетом.';
   }catch(e){document.getElementById('trouser-print-status').textContent=e.message;}
  };render();
 })(typeof window!=='undefined'?window:globalThis);
